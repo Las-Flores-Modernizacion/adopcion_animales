@@ -1,0 +1,5 @@
+class AddUrgentToAnimal < ActiveRecord::Migration[8.0]
+  def change
+    add_column :animals, :urgent, :boolean
+  end
+end
