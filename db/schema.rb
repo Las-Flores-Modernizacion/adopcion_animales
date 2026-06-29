@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_29_173815) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_29_181002) do
   create_table "accounts", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest"
@@ -89,6 +89,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_173815) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_sessions_on_account_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
