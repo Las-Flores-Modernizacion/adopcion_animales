@@ -1,0 +1,36 @@
+<nav class="w-full bg-white border-b border-gray-300" data-controller="navbar">
+  <div class="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center justify-between w-full sm:w-auto">
+      <div class="flex items-center space-x-3 flex-shrink-0">
+        <%= image_tag "logo_gobierno_municipal.png", alt: "Logo", class: "h-10 w-auto" %>
+        <h1 class="text-lg font-bold text-gray-800 hidden sm:block">Adopción</h1>
+      </div>
+
+      <button class="sm:hidden p-2 text-gray-600 cursor-pointer" data-action="click->navbar#toggle">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+      </button>
+    </div>
+
+    <div class="hidden sm:flex sm:justify-between items-center gap-2 pb-1 sm:pb-0 w-full sm:w-auto flex-col sm:flex-row bg-white p-4 sm:p-0" data-navbar-target="menu">
+      <!--
+      <%# <%= link_to "", _path, class: "flex items-center justify-center gap-1.5 rounded-lg border border-neutral-400/30 text-neutral-800 hover:bg-neutral-100 px-3.5 py-2 mb-2 sm:mb-0 text-sm font-medium whitespace-nowrap shadow-sm transition-all duration-100 ease-in-out select-none disabled:opacity-50 w-full sm:w-auto" %> %>
+      -->
+
+      <% if authenticated? %>
+        <%= button_to logout_path, method: :delete, class: "group flex items-center justify-center rounded-lg border border-red-200 bg-red-600 px-3 py-2 mb-2 sm:mb-0 text-sm font-medium text-white shadow-sm transition-all hover:bg-red-400 hover:text-white-900 cursor-pointer w-full sm:w-auto" do %>
+          <span>Cerrar sesión</span>
+        <% end %>
+      <% end %>
+
+      <% if !authenticated? %>
+        <%= button_to "/auth/google",
+          method: :post,
+          data: { turbo: false },
+          params: { authenticity_token: form_authenticity_token },
+          class: "flex items-center justify-center gap-1.5 rounded-lg border border-black/10 bg-white/90 px-3.5 py-2 text-sm font-medium whitespace-nowrap text-neutral-800 shadow-xs transition-all duration-100 ease-in-out select-none hover:bg-neutral-50 cursor-pointer disabled:opacity-50 w-full sm:w-auto" do %>
+          <span>Iniciar sesión</span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</nav>

@@ -24,7 +24,13 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <%= render "shared/navbar" %>
+    <main class="container mx-auto mt-10 px-5 flex flex-col items-center">
+      <% flash.each do |type, msg| %>
+        <div class="w-full max-w-2xl p-4 mb-4 text-sm <%= type == 'alert' ? 'text-red-800 bg-red-50' : 'text-blue-800 bg-blue-50' %> rounded-lg" role="alert">
+          <%= msg %>
+        </div>
+      <% end %>
       <%= yield %>
     </main>
   </body>
