@@ -1,7 +1,10 @@
 class Account < ApplicationRecord
   has_secure_password validations: :false
 
+  belongs_to :user, dependent: :destroy
   has_many :sessions, dependent: :destroy
+
+  before_validation :ensure_user_exists, on: :create
 
   normalizes :email_address, :first_name, :last_name, with: ->(e) { e.strip.downcase }
 
@@ -54,6 +57,10 @@ class Account < ApplicationRecord
   end
 
   private
+
+  def ensure_user_exists
+    self.build_user() unless user.present?
+  end
 
   class << self
     private
