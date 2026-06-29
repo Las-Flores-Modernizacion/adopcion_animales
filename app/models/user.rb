@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  haz_one :account
+  has_one :account
 
   delegate :full_name, to: :account
 end
