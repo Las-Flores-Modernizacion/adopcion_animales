@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_29_140223) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_29_163107) do
   create_table "accounts", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest"
@@ -39,6 +39,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_140223) do
     t.boolean "is_anxious", null: false
     t.integer "age"
     t.string "race"
+  end
+
+  create_table "locations", force: :cascade do |t|
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.binary "geometry"
   end
 
   create_table "reports", force: :cascade do |t|
