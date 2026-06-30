@@ -1,0 +1,43 @@
+<div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 min-h-screen">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+    <div>
+      <h1 class="text-3xl font-extrabold text-neutral-900 dark:text-neutral-50 tracking-tight">
+        Mis Reportes
+      </h1>
+
+      <p class="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
+        Gestiona y sigue el estado de tus reportes.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <%= link_to "Nuevo Reporte", new_report_path %>
+    </div>
+  </div>
+
+  <% if @reports.any? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @reports.each do |report| %>
+        <div>
+          <div>
+            <%= image_tag((report.photo.attached? ? report.photo : nil)) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="flex flex-col items-center justify-center p-16 rounded-3xl border-2 border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 text-center">
+      <div class="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mb-4">
+        <svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      </div>
+
+      <h3 class="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-1">
+        Aún no tienes pedidos
+      </h3>
+
+      <p class="text-neutral-500 dark:text-neutral-400 text-sm mb-6 max-w-sm">
+        No has reportado ninguna incidencia urbana todavía. Cuando lo hagas, aparecerán aquí.
+      </p>
+    </div>
+  <% end %>
+</div>

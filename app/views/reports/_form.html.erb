@@ -1,0 +1,90 @@
+<%= form_with(model: [report], local: true, class: "w-full") do |form| %>
+  <%= form.hidden_field :browser_lat, id: "browser_lat" %>
+  <%= form.hidden_field :browser_lng, id: "browser_lng" %>
+
+  <div class="space-y-8 bg-white dark:bg-neutral-900 p-6 sm:p-8 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+
+    <%= render "shared/components/forms/errors", object: report %>
+
+    <section data-controller="image-compression">
+      <label class="block text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-3">
+        Foto
+        <span class="text-red-500">*</span>
+      </label>
+
+      <%# Preview %>
+      <div class="mb-4">
+        <% if report.persisted? && report.photo&.attached? %>
+          <%= image_tag report.photo.variant(:thumb), class: "w-full max-h-64 object-cover rounded-2xl border border-neutral-200 dark:border-neutral-700" %>
+        <% end %>
+      </div>
+
+      <%# Photo field %>
+      <div>
+        <%= form.file_field :photo,
+          id: "report_photo_input",
+          accept: "image/*",
+          capture: "camera",
+          required: !report.photo&.attached?,
+          data: {
+            image_compression_target: "input",
+            action: "change->image-compression#compress"
+          }
+        %>
+      </div>
+    </section>
+  </div>
+
+  <%= form.submit "Publicar Reporte" %>
+<% end %>
+
+<script>
+  document.addEventListener("turbo:load", function() {
+    const latInput = document.getElementById('browser_lat');
+    const lngInput = document.getElementById('browser_lng');
+
+    // Opcional: Deshabilita el botón de envío hasta tener la ubicación
+    const submitBtn = document.querySelector('button[type="submit"]');
+
+    // Solo pedimos si el navegador soporta geolocalización y aún no tenemos coordenadas
+    if (navigator.geolocation && !latInput.value) {
+      if(submitBtn) submitBtn.disabled = true; // Bloquea el envío temporalmente
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          // Éxito: Guardamos coordenadas y habilitamos el botón
+          latInput.value = position.coords.latitude;
+          lngInput.value = position.coords.longitude;
+          if(submitBtn) submitBtn.disabled = false;
+        },
+        function(error) {
+          // Fallo: Evaluamos por qué falló y alertamos al usuario
+          console.warn("GPS error: ", error);
+          let errorMessage = "No se pudo obtener la ubicación.";
+
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Debes habilitar el acceso a la ubicación (GPS) en tu navegador para enviar este pedido.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "La información de tu ubicación no está disponible en este momento.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Se agotó el tiempo para obtener tu ubicación. Intenta nuevamente.";
+              break;
+          }
+
+          document.getElementById('gps-warning').classList.remove('hidden');
+          document.getElementById('gps-warning').innerHTML = `<span class="font-bold">¡Atención!</span> ${errorMessage}`;
+        },
+        {
+          enableHighAccuracy: true, // Crucial: Obliga al dispositivo a usar el hardware GPS en lugar de WiFi/IP
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    } else if (!navigator.geolocation) {
+      alert("Tu navegador o dispositivo no soporta la función de geolocalización.");
+    }
+  });
+</script>

@@ -1,0 +1,12 @@
+<% if object.errors.any? %>
+  <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-6 border border-red-200">
+    <h3 class="font-bold">
+      No se pudo guardar debido a <%= object.errors.count %> <%= object.errors.count == 1 ? 'error' : 'errores' %>:
+    </h3>
+    <ul class="list-disc pl-5 mt-2 space-y-1">
+      <% object.errors.each do |error| %>
+        <li><%= error.message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
