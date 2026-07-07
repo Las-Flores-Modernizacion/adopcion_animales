@@ -66,11 +66,11 @@ class Account < ApplicationRecord
     private
 
     def extract_first_name(auth)
-      auth.info.first_name.downcase || auth.info.name&.split.first.downcase || "sin nombre"
+      auth.info.first_name&.downcase || auth.info.name&.split.first.downcase || "sin nombre"
     end
 
     def extract_last_name(auth)
-      auth.info.last_name.downcase || auth.info.name&.split.last.downcase || "sin apellido"
+      auth.info.last_name&.downcase || auth.info.name&.split.last.downcase || "sin apellido"
     end
 
     def parse_oauth_expiration(auth)
