@@ -10,6 +10,20 @@ class Report < ApplicationRecord
   validate :tipo_de_archivo_aceptado
   validate :tamaño_archivo_aceptado
 
+  def save_with_location(location_params)
+    ActiveRecord::Base.transaction do
+      location = Location.create!(
+        latitude: location_params[:browser_lat],
+        longitude: location_params[:browser_lng]
+      )
+      self.location = location
+      save!
+      true
+    end
+  rescue ActiveRecord::RecordInvalid
+    false
+  end
+
   private
 
   def tipo_de_archivo_aceptado
