@@ -2,15 +2,16 @@ require "test_helper"
 
 class AnimalTest < ActiveSupport::TestCase
   setup do
-    @tito = animals(:tito)
+    @tito = animals(:tito) # Obtiene el objeto Animal correspondiente al fixture :tito.
     @tasha = animals(:tasha)
   end
 
   test "el color debe ser solo letras" do
-    animal = @tito
+    animal = @tito # Crea una variable local que hace referencia al mismo objeto que @tito.
     animal.color = "123456"
     assert_not animal.save
 
+    
     animal.color = "a354"
     assert_not animal.save
 
