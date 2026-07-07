@@ -1,6 +1,6 @@
 <%= form_with(model: [report], local: true, class: "w-full") do |form| %>
-  <%= form.hidden_field :browser_lat, id: "browser_lat" %>
-  <%= form.hidden_field :browser_lng, id: "browser_lng" %>
+  <%= hidden_field_tag :browser_lat, nil, id: "browser_lat" %>
+  <%= hidden_field_tag :browser_lng, nil, id: "browser_lng" %>
 
   <div class="space-y-8 p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm">
 

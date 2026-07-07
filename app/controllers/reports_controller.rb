@@ -8,11 +8,24 @@ class ReportsController < ApplicationController
   end
 
   def create
-    @report = Current.user.reports.new(claims_params)
-    if @report.save
-      redirect_to reports_path, notice: "Reporte creado exitosamente."
-    else
-      render :new, status: :unprocessable_content, alert: "Error al publicar reporte, intenta de nuevo por favor."
+    ActiveRecord::Base.transaction do
+      @location = Location.create!(
+        latitude: params[:browser_lat],
+        longitude: params[:browser_lng]
+      )
+
+      @report = Current.user.reports.new(claims_params)
+      @report.location = @location
+
+      if @report.save
+        redirect_to reports_path, notice: "Reporte creado exitosamente."
+      else
+        render :new, status: :unprocessable_content, alert: "Error al publicar reporte, intenta de nuevo por favor."
+      end
+    rescue ActiveRecord::RecordInvalid
+      @report ||= Current.user.reports.new(claims_params)
+      flash.now[:alert] = "Error al publicar reporte, intenta de nuevo por favor."
+      render new, status: :unprocessable_content
     end
   end
 

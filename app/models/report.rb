@@ -1,9 +1,11 @@
 class Report < ApplicationRecord
   belongs_to :user
+  belongs_to :location
 
   has_one_attached :photo
 
   validates :photo, presence: { message: "La foto no puede faltar." }
+  validates :location, presence: true
 
   validate :tipo_de_archivo_aceptado
   validate :tamaño_archivo_aceptado
@@ -26,7 +28,7 @@ class Report < ApplicationRecord
   end
 
   # Se permiten archivos de hasta 20 MB, si es menos o más lo cambiamos.
-  def tamaño_archivo_aceptado 
+  def tamaño_archivo_aceptado
     if photo.attached?
       tamaño_archivo = photo.blob.byte_size
       if tamaño_archivo >= 20.megabytes
