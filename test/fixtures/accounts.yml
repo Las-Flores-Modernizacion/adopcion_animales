@@ -1,0 +1,7 @@
+
+
+tomas:
+  email_address: "urratomi002@gmail.com"
+  first_name: "Tomás"
+  last_name: "Urra"
+  user: tomas #Si pongo user, iria el nombre del usuario, si pongo user_id va el número
