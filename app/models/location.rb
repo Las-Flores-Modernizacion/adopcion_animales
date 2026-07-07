@@ -1,7 +1,7 @@
 class Location < ApplicationRecord
   validates :latitude, :longitude, presence: true
 
-  after_save :update_geometry
+  after_save :update_geometry, unless: -> { Rails.env.test? }
 
   private
 

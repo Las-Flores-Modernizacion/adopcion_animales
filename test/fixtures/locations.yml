@@ -1,9 +1,12 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# one:
-#   latitude: 9.99
-#   longitude: 9.99
-#
-# two:
-#   latitude: 9.99
-#   longitude: 9.99
+obelisco:
+  latitude: -34.603722
+  longitude: -58.381592
+
+estatua_libertad:
+  latitude: 40.689247
+  longitude: -74.044502
+
+invalida_sin_nada:
+  created_at: <%= Time.current %>
