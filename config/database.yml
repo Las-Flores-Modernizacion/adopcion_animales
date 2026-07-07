@@ -12,7 +12,7 @@ default: &default
 development:
   <<: *default
   database: storage/development.sqlite3
-  extension:
+  extensions:
     - mod_spatialite
 
 # Warning: The database defined as "test" will be erased and
