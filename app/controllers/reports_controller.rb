@@ -3,12 +3,34 @@ class ReportsController < ApplicationController
   helper_method :calculate_next_step
 
   def index
-    @reports = Current.user.reports
+    @current_tab = params[:tab] || "own"
+
+    if @current_tab == "community"
+      @reports = Report.community(Current.user).order(created_at: :desc)
+    else
+      @reports = Report.own(Current.user).order(created_at: :desc)
+    end
+  end
+
+  def publish
+    @report = Current.user.reports.find(params[:id])
+    if @report.update(draft: false)
+      session[:current_report_id] = nil
+      redirect_to reports_path, notice: "Reporte publicado exitosamente."
+    else
+      redirect_to reports_path, alert: "No se pudo publicar el reporte."
+    end
   end
 
   def new
-    @report = Report.new
-    session[:current_report_id] = nil
+    if params[:report_id].present?
+      session[:current_report_id] = params[:report_id]
+      @report = Current.user.reports.find(params[:report_id])
+      @animal = @report.animal || @report.build_animal
+    else
+      session[:current_report_id] = nil
+      @report = Report.new
+    end
   end
 
   def create
@@ -17,6 +39,7 @@ class ReportsController < ApplicationController
 
     if @location.save && @report.save(validate: false)
       session[:current_report_id] = @report.id
+      @animal = @report.animal || @report.build_animal
       respond_to { |format| format.turbo_stream }
     else
       render :new, status: :unprocessable_content
@@ -25,16 +48,19 @@ class ReportsController < ApplicationController
 
   def calculate_next_step
     animal = @report.animal
-    return 'species' if animal.nil? || animal.species.blank?
-    return 'race' if animal.race.blank?
-    return 'age' if animal.age.blank?
-    return 'is_anxious' if animal.is_anxious.nil?
-    'finish'
+    return "species" if animal.nil? || animal.species.blank?
+    return "race" if animal.race.blank?
+    return "age" if animal.age.blank?
+    return "is_anxious" if animal.is_anxious.nil?
+    return "photo_permission" unless session["photo_permission_#{@report.id}"] || @report.photo.attached?
+    "finish"
   end
 
   def answer_photo_permission
     @can_photo = params[:can_photo] == "true"
     @animal = @report.animal || @report.build_animal
+
+    session["photo_permission_#{@report.id}"] = true
 
     respond_to { |format| format.turbo_stream }
   end

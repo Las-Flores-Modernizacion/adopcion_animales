@@ -7,5 +7,5 @@
 <% end %>
 
 <%= turbo_stream.append "chat-timeline" do %>
-  <%= render "reports/steps/question_photo_permission" %>
+  <%= render "reports/steps/question_#{calculate_next_step}" %>
 <% end %>

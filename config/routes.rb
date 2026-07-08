@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   delete "/logout", to: "sessions#destroy"
 
   resources :reports, path: "reportes" do
+    member do
+      patch :publish
+    end
     collection do
       post :answer_photo_permission
       post :attach_photo

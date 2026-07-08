@@ -1,0 +1,68 @@
+<% if @report.new_record? %>
+  <%= render "reports/steps/question_location" %>
+<% else %>
+  <div id="step-location-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
+    <div class="bg-blue-600 p-3.5 rounded-2xl rounded-tr-none text-white max-w-[85%] text-sm shadow-sm">
+      📍 Ubicación enviada correctamente.
+    </div>
+  </div>
+
+  <% if @animal %>
+    <% if @animal.species.present? %>
+      <div id="step-animal-species-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
+        <div class="bg-blue-600 p-3.5 rounded-2xl rounded-tr-none text-white max-w-[85%] text-sm shadow-sm">
+          <%= @animal.species.humanize %>
+        </div>
+        <%= link_to "Modificar", edit_step_reports_path(step: "species"), data: { turbo_stream: true }, class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
+      </div>
+    <% end %>
+
+    <% if @animal.race.present? %>
+      <div id="step-animal-race-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
+        <div class="bg-blue-600 p-3.5 rounded-2xl rounded-tr-none text-white max-w-[85%] text-sm shadow-sm">
+          <%= @animal.race.humanize %>
+        </div>
+        <%= link_to "Modificar", edit_step_reports_path(step: "race"), data: { turbo_stream: true }, class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
+      </div>
+    <% end %>
+
+    <% if @animal.age.present? %>
+      <div id="step-animal-age-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
+        <div class="bg-blue-600 p-3.5 rounded-2xl rounded-tr-none text-white max-w-[85%] text-sm shadow-sm">
+          <%= @animal.age %> años
+        </div>
+        <%= link_to "Modificar", edit_step_reports_path(step: "age"), data: { turbo_stream: true }, class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
+      </div>
+    <% end %>
+
+    <% unless @animal.is_anxious.nil? %>
+      <div id="step-animal-is_anxious-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
+        <div class="bg-blue-600 p-3.5 rounded-2xl rounded-tr-none text-white max-w-[85%] text-sm shadow-sm">
+          <%= @animal.is_anxious ? "Sí" : "No" %>
+        </div>
+        <%= link_to "Modificar", edit_step_reports_path(step: "is_anxious"), data: { turbo_stream: true }, class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if session["photo_permission_#{@report.id}"] || @report.photo.attached? %>
+    <div id="step-photo-permission-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
+      <div class="bg-blue-600 p-3.5 rounded-2xl rounded-tr-none text-white max-w-[85%] text-sm shadow-sm">
+        <%= session["photo_permission_#{@report.id}"] ? (@report.photo.attached? ? "Sí, puedo sacar una foto." : "No puedo sacar una foto ahora.") : "Sí, puedo sacar una foto." %>
+      </div>
+      <%= link_to "Cambiar", edit_step_reports_path(step: "photo_permission"), data: { turbo_stream: true }, class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
+    </div>
+  <% end %>
+
+  <% if @report.photo.attached? %>
+    <div id="step-photo-upload-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
+      <div class="bg-blue-600 p-2.5 rounded-2xl rounded-tr-none text-white max-w-[70%] shadow-sm">
+        <p class="text-[11px] font-semibold mb-1.5 text-blue-100">Imagen adjunta:</p>
+        <%= image_tag @report.photo, class: "rounded-xl max-h-40 w-full object-cover border border-blue-500" if @report.photo.blob&.persisted? %>
+      </div>
+      <%= link_to "Cambiar foto", edit_step_reports_path(step: "photo"), data: { turbo_stream: true }, class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
+    </div>
+  <% end %>
+
+  <%= render "reports/steps/question_#{calculate_next_step}" %>
+<% end %>
