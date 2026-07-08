@@ -19,8 +19,17 @@ export default class extends Controller {
       success: (compressedResult) => {
         // Truco para reemplazar el archivo pesado por el ligero en el input
         let dataTransfer = new DataTransfer();
-        dataTransfer.items.add(compressedResult);
+
+        // Si compressedResult es un Blob, lo convertimos a File para evitar errores en algunos navegadores
+        const newFile = new File([compressedResult], file.name, {
+          type: compressedResult.type || file.type,
+          lastModified: Date.now(),
+        });
+
+        dataTransfer.items.add(newFile);
         this.inputTarget.files = dataTransfer.files;
+
+        // Disparar evento para que auto-submit-photo lo capture
         this.dispatch("success", { target: this.inputTarget });
       },
       error(err) {
