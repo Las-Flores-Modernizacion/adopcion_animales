@@ -7,9 +7,9 @@ class Report < ApplicationRecord
 
   validates :location, presence: true
 
-  scope :own, ->(user) { where(user_id: user.id) }
+  scope :own, -> { where(user_id: Current.user.id) }
   scope :published, -> { where(draft: false).or(where(draft: nil)) }
-  scope :community, ->(user) { published.where.not(user_id: user.id) }
+  scope :community, -> { published.where.not(user_id: Current.user.id) }
 
   validate :tipo_de_archivo_aceptado
   validate :tamaño_archivo_aceptado

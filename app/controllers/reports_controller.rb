@@ -6,9 +6,9 @@ class ReportsController < ApplicationController
     @current_tab = params[:tab] || "own"
 
     if @current_tab == "community"
-      @reports = Report.community(Current.user).order(created_at: :desc)
+      @reports = Report.community.order(created_at: :desc)
     else
-      @reports = Report.own(Current.user).order(created_at: :desc)
+      @reports = Report.own.order(created_at: :desc)
     end
   end
 
