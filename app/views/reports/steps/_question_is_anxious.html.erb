@@ -1,7 +1,7 @@
 <div id="step-animal-is_anxious-container" class="animate-fade-in space-y-3 current-question-container">
   <div class="flex items-start gap-3">
     <div class="bg-neutral-100 p-4 rounded-2xl rounded-tl-none shadow-sm text-neutral-800 max-w-[85%] text-sm">
-      ¿Notás al animal nervioso, asustado o ansioso? 🥺
+      ¿Notás al animal nervioso, asustado o ansioso?
 
       <%= form_with model: @animal, url: answer_animal_step_reports_path(current_field: :is_anxious, next_field: :finish, is_edit: local_assigns[:is_edit]), method: :post, class: "mt-3 flex gap-2" do |f| %>
         <button type="submit" name="animal[is_anxious]" value="true" class="bg-white border border-neutral-300 text-red-600 font-semibold text-xs px-4 py-2 rounded-xl hover:bg-neutral-50 shadow-sm">Sí, está ansioso</button>

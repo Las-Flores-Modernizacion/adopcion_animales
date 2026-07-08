@@ -1,7 +1,7 @@
 <div id="step-location-container" class="space-y-2 animate-fade-in">
   <div class="flex items-start gap-3">
     <div class="bg-neutral-100 p-4 rounded-2xl rounded-tl-none shadow-sm text-neutral-800 max-w-[85%] text-sm">
-      ¡Hola! Para registrar un nuevo reporte, primero necesito que compartas tu ubicación actual. 📍
+      ¡Hola! Para registrar un nuevo reporte, primero necesito que compartas tu ubicación actual.
 
       <%= form_with url: reports_path, method: :post, class: "mt-3", data: { controller: "chat-gps" } do |f| %>
         <%= hidden_field_tag :browser_lat, nil, data: { chat_gps_target: "lat" } %>
