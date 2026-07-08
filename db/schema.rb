@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_07_132851) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_08_132056) do
   create_table "accounts", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest"
@@ -56,19 +56,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_132851) do
   end
 
   create_table "animals", force: :cascade do |t|
-    t.string "color", null: false
-    t.integer "size", null: false
-    t.boolean "aggressive", null: false
+    t.string "color"
+    t.integer "size"
+    t.boolean "aggressive"
     t.string "unique_detail"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "is_hurt", null: false
+    t.boolean "is_hurt"
     t.boolean "urgent"
     t.string "answer_to_name"
-    t.integer "species", null: false
-    t.boolean "is_anxious", null: false
+    t.integer "species"
+    t.boolean "is_anxious"
     t.integer "age"
     t.string "race"
+    t.integer "report_id", null: false
+    t.index ["report_id"], name: "index_animals_on_report_id"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -105,6 +107,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_132851) do
   add_foreign_key "accounts", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "animals", "reports"
   add_foreign_key "reports", "locations"
   add_foreign_key "reports", "users"
   add_foreign_key "sessions", "accounts"

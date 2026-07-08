@@ -1,10 +1,10 @@
 class Report < ApplicationRecord
   belongs_to :user
   belongs_to :location
+  has_one :animal, dependent: :destroy
 
   has_one_attached :photo
 
-  validates :photo, presence: { message: "La foto no puede faltar." }
   validates :location, presence: true
 
   validate :tipo_de_archivo_aceptado
