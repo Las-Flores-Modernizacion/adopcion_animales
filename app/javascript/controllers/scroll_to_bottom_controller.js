@@ -1,14 +1,25 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="scroll-to-bottom"
 export default class extends Controller {
   connect() {
     this.scrollToBottom()
-    
-    this.observer = new MutationObserver(() => {
-      this.scrollToBottom()
+
+    this.observer = new MutationObserver((mutations) => {
+      let shouldScroll = false
+      for (const mutation of mutations) {
+        if (mutation.addedNodes.length > 0) {
+          shouldScroll = true
+          break
+        }
+      }
+
+      if (shouldScroll) {
+        setTimeout(() => {
+          this.scrollToBottom()
+        }, 100)
+      }
     })
-    
+
     this.observer.observe(this.element, {
       childList: true,
       subtree: true
@@ -22,9 +33,14 @@ export default class extends Controller {
   }
 
   scrollToBottom() {
-    this.element.scrollTo({
-      top: this.element.scrollHeight,
-      behavior: 'smooth'
-    })
+    const lastElementChild = this.element.lastElementChild
+    if (lastElementChild) {
+      lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    } else {
+      this.element.scrollTo({
+        top: this.element.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
   }
 }
