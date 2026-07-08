@@ -11,7 +11,14 @@ Rails.application.routes.draw do
   end
   delete "/logout", to: "sessions#destroy"
 
-  resources :reports, path: "reportes"
+  resources :reports, path: "reportes" do
+    collection do
+      post :answer_photo_permission
+      post :attach_photo
+      post :answer_animal_step
+      get :edit_step
+    end
+  end
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
