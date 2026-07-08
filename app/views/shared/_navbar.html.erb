@@ -17,6 +17,8 @@
       -->
 
       <% if authenticated? %>
+        <%= link_to "Reportes", reports_path, class: "flex items-center justify-center gap-1.5 rounded-lg border border-neutral-400/30 text-neutral-800 hover:bg-neutral-100 px-3.5 py-2 mb-2 sm:mb-0 text-sm font-medium whitespace-nowrap shadow-sm transition-all duration-100 ease-in-out select-none disabled:opacity-50 w-full sm:w-auto" %>
+
         <%= button_to logout_path, method: :delete, class: "group flex items-center justify-center rounded-lg border border-red-200 bg-red-600 px-3 py-2 mb-2 sm:mb-0 text-sm font-medium text-white shadow-sm transition-all hover:bg-red-400 hover:text-white-900 cursor-pointer w-full sm:w-auto" do %>
           <span>Cerrar sesión</span>
         <% end %>
