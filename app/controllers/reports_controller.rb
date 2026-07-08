@@ -42,6 +42,7 @@ class ReportsController < ApplicationController
   def attach_photo
     if params[:report] && params[:report][:photo]
       @report.photo.attach(params[:report][:photo])
+      @report.save
     end
 
     @animal = @report.animal || @report.build_animal

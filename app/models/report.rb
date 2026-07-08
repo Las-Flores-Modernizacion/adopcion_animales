@@ -31,6 +31,8 @@ class Report < ApplicationRecord
       image/jpeg
       image/png
       image/webp
+      image/avif
+      image/heic
     ]
 
     if photo.attached?
