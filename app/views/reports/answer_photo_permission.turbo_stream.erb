@@ -14,10 +14,10 @@
         <div class="bg-neutral-100 p-4 rounded-2xl rounded-tl-none shadow-sm text-neutral-800 max-w-[85%] w-full text-sm">
           ¡Perfecto! Presioná abajo para abrir la cámara automáticamente de tu dispositivo:
 
-          <%= form_with model: @report, url: attach_photo_reports_path(is_edit: params[:is_edit]), method: :post, class: "mt-3", data: { controller: "auto-submit-photo" } do |f| %>
+          <%= form_with model: @report, url: attach_photo_reports_path(is_edit: params[:is_edit]), method: :post, class: "mt-3", data: { controller: "auto-submit-photo image-compression", action: "image-compression:success->auto-submit-photo#submit" } do |f| %>
             <label class="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-xl p-4 bg-white cursor-pointer hover:bg-neutral-50 transition">
-              <span class="text-xs font-semibold text-blue-600">Abrir Cámara</span>
-              <%= f.file_field :photo, accept: "image/*", capture: "camera", class: "hidden", data: { action: "change->auto-submit-photo#submit" } %>
+              <span class="text-xs font-semibold text-blue-600" data-image-compression-target="info">Abrir Cámara</span>
+              <%= f.file_field :photo, accept: "image/*", capture: "camera", class: "hidden", data: { image_compression_target: "input", action: "change->image-compression#compress" } %>
             </label>
           <% end %>
         </div>
