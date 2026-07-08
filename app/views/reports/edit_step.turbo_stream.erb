@@ -1,3 +1,15 @@
-<%= turbo_stream.replace "step-animal-#{@step}-container" do %>
-  <%= render "reports/steps/question_#{@step}" %>
+<%= turbo_stream.remove_all ".current-question-container" %>
+
+<% if @step == "location" %>
+  <%= turbo_stream.replace "step-location-container" do %>
+    <%= render "reports/steps/question_location", is_edit: true %>
+  <% end %>
+<% elsif @step == "photo" || @step == "photo_permission" %>
+  <%= turbo_stream.replace "step-#{@step == 'photo' ? 'photo-upload' : 'photo-permission'}-container" do %>
+    <%= render "reports/steps/question_photo_permission", is_edit: true %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.replace "step-animal-#{@step}-container" do %>
+    <%= render "reports/steps/question_#{@step}", is_edit: true %>
+  <% end %>
 <% end %>
