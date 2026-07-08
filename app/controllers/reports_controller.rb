@@ -1,5 +1,6 @@
 class ReportsController < ApplicationController
   before_action :set_draft_report, only: %i[answer_photo_permission attach_photo answer_animal_step edit_step]
+  helper_method :calculate_next_step
 
   def index
     @reports = Current.user.reports
@@ -22,11 +23,18 @@ class ReportsController < ApplicationController
     end
   end
 
+  def calculate_next_step
+    animal = @report.animal
+    return 'species' if animal.nil? || animal.species.blank?
+    return 'race' if animal.race.blank?
+    return 'age' if animal.age.blank?
+    return 'is_anxious' if animal.is_anxious.nil?
+    'finish'
+  end
+
   def answer_photo_permission
     @can_photo = params[:can_photo] == "true"
-    unless @can_photo
-      @animal = @report.animal || @report.create_animal
-    end
+    @animal = @report.animal || @report.build_animal
 
     respond_to { |format| format.turbo_stream }
   end
@@ -36,7 +44,7 @@ class ReportsController < ApplicationController
       @report.photo.attach(params[:report][:photo])
     end
 
-    @animal = @report.animal || @report.create_animal
+    @animal = @report.animal || @report.build_animal
 
     respond_to { |format| format.turbo_stream }
   end
