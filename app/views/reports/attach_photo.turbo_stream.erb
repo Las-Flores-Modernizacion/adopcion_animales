@@ -2,7 +2,7 @@
   <div id="step-photo-upload-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
     <div class="bg-blue-600 p-2.5 rounded-2xl rounded-tr-none text-white max-w-[70%] shadow-sm">
       <p class="text-[11px] font-semibold mb-1.5 text-blue-100">Imagen adjunta:</p>
-      <%= image_tag @report.photo.variant(:thumb), class: "rounded-xl max-h-40 w-full object-cover border border-blue-500" if @report.photo.attached? %>
+      <%= image_tag @report.photo, class: "rounded-xl max-h-40 w-full object-cover border border-blue-500" if @report.photo.attached? %>
     </div>
     <%= link_to "Cambiar foto", edit_step_reports_path(step: "photo"), data: { turbo_stream: true }, class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
   </div>
