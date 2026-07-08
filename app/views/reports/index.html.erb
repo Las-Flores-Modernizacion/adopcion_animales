@@ -19,9 +19,13 @@
       <!-- espacio del reporte entero -->
         <div class="flex border h-30">
           <!--tamaño de la foto-->
-          <div class="flex w-50 h-3+0 object-cover"> 
-            <%= image_tag((report.photo.attached? ? report.photo : nil), class: "w-full h-full") %>
-          </div>
+          <% if report.photo.attached? %>
+            <div class="flex w-50 h-3+0 object-cover"> 
+              <%= image_tag(report.photo, class: "w-full h-full") %>
+            </div>
+          <% else %>
+            <p>No hay foto</p>
+          <% end %>
            <!--informacion del reporte--> 
           <div class="flex items-center ">
             <!--tamaño de la palabra-->
