@@ -8,8 +8,10 @@ export default class extends Controller {
     const file = event.target.files[0];
     if (!file) return;
 
-    this.infoTarget.textContent = `Procesando: ${file.name}...`
-    this.infoTarget.classList.add("text-blue-500")
+    if (this.hasInfoTarget) {
+      this.infoTarget.textContent = `Procesando: ${file.name}...`
+      this.infoTarget.classList.add("text-blue-500")
+    }
 
     new Compressor(file, {
       quality: 0.6, // Baja la calidad al 60%
@@ -19,6 +21,7 @@ export default class extends Controller {
         let dataTransfer = new DataTransfer();
         dataTransfer.items.add(compressedResult);
         this.inputTarget.files = dataTransfer.files;
+        this.dispatch("success", { target: this.inputTarget });
       },
       error(err) {
         console.log(err.message);
