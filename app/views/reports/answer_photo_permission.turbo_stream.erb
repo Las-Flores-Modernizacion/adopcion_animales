@@ -1,0 +1,28 @@
+<%= turbo_stream.replace "step-photo-permission-container" do %>
+  <div class="flex flex-col items-end gap-1 w-full animate-fade-in">
+    <div class="bg-blue-600 p-3.5 rounded-2xl rounded-tr-none text-white max-w-[85%] text-sm shadow-sm">
+      <%= @can_photo ? "Sí, puedo sacar una foto." : "No puedo sacar una foto ahora." %>
+    </div>
+  </div>
+<% end %>
+
+<%= turbo_stream.append "chat-timeline" do %>
+  <% if @can_photo %>
+    <div id="step-photo-upload-container" class="animate-fade-in space-y-3">
+      <div class="flex items-start gap-3">
+        <div class="bg-neutral-100 p-4 rounded-2xl rounded-tl-none shadow-sm text-neutral-800 max-w-[85%] w-full text-sm">
+          ¡Perfecto! Presioná abajo para abrir la cámara automáticamente de tu dispositivo:
+
+          <%= form_with model: @report, url: attach_photo_reports_path, method: :post, class: "mt-3", data: { controller: "auto-submit-photo" } do |f| %>
+            <label class="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-xl p-4 bg-white cursor-pointer hover:bg-neutral-50 transition">
+              <span class="text-xs font-semibold text-blue-600">Abrir Cámara</span>
+              <%= f.file_field :photo, accept: "image/*", capture: "camera", class: "hidden", data: { action: "change->auto-submit-photo#submit" } %>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <%= render "reports/steps/question_species" %>
+  <% end %>
+<% end %>
