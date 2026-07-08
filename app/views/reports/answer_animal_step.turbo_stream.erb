@@ -1,13 +1,14 @@
 <%= turbo_stream.replace "step-animal-#{params[:current_field]}-container" do %>
-  <div class="flex flex-col items-end gap-1 w-full animate-fade-in">
+  <div id="step-animal-<%= params[:current_field] %>-container" class="flex flex-col items-end gap-1 w-full animate-fade-in">
     <div class="bg-blue-600 p-3.5 rounded-2xl rounded-tr-none text-white max-w-[85%] text-sm shadow-sm">
       <% value = @animal.send(params[:current_field]) %>
       <%= value.is_a?(TrueClass) || value.is_a?(FalseClass) ? (value ? "Sí" : "No") : value.to_s.humanize %>
     </div>
-    <%= link_to "Modificar", edit_step_reports_path(step: params[:current_field]), class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
+    <%= link_to "Modificar", edit_step_reports_path(step: params[:current_field]), data: { turbo_stream: true }, class: "text-[11px] text-neutral-400 hover:underline mr-1" %>
   </div>
 <% end %>
 
+<% next_step = calculate_next_step %>
 <%= turbo_stream.append "chat-timeline" do %>
-  <%= render "reports/steps/question_#{@next_step}" %>
+  <%= render "reports/steps/question_#{next_step}" %>
 <% end %>
