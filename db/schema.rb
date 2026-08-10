@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_08_173235) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_10_143622) do
   create_table "accounts", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest"
@@ -23,6 +23,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_173235) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "avatar_url"
     t.index ["email_address"], name: "index_accounts_on_email_address", unique: true
     t.index ["user_id"], name: "index_accounts_on_user_id"
   end

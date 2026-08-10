@@ -28,6 +28,7 @@ class Account < ApplicationRecord
         uid: auth.uid,
         oauth_token: auth.credentials.token,
         oauth_expires_at: parse_oauth_expiration(auth),
+        avatar_url: auth.info.image,
         password: SecureRandom.hex(32)
       )
       account.save
@@ -36,12 +37,14 @@ class Account < ApplicationRecord
         provider: auth.provider.downcase,
         uid: auth.uid,
         oauth_token: auth.credentials.token,
-        oauth_expires_at: parse_oauth_expiration(auth)
+        oauth_expires_at: parse_oauth_expiration(auth),
+        avatar_url: auth.info.image
       )
     else
       account.update(
         oauth_token: auth.credentials.token,
-        oauth_expires_at: parse_oauth_expiration(auth)
+        oauth_expires_at: parse_oauth_expiration(auth),
+        avatar_url: auth.info.image
       )
     end
 
