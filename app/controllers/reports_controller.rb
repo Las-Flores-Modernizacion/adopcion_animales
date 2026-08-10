@@ -5,11 +5,8 @@ class ReportsController < ApplicationController
   def index
     @current_tab = params[:tab] || "own"
 
-    if @current_tab == "community"
-      @reports = Report.community.order(created_at: :desc)
-    else
-      @reports = Report.own.order(created_at: :desc)
-    end
+    @community_reports = Report.community.order(created_at: :desc)
+    @own_reports = Report.own.order(created_at: :desc)
   end
 
   def publish

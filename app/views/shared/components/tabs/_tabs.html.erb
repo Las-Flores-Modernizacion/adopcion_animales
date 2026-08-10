@@ -1,0 +1,225 @@
+<%#
+  Tabs Component
+  Tabbed content panels with keyboard navigation and ARIA accessibility.
+
+  Required locals:
+    - tabs: Array of tab hashes (see below)
+    - panels: Array of panel content strings/HTML OR use a block
+
+  Optional locals:
+    - variant: String (default: "pills") - "pills", "underline", "low_contrast" ("bordered" is a legacy alias)
+    - orientation: String (default: "horizontal") - "horizontal", "vertical"
+    - default_tab: Integer (default: 0) - Index of tab to show on load
+    - url_sync: Boolean (default: false) - Update URL hash when tab changes
+    - scroll_to_anchor: Boolean (default: false) - Scroll page when URL hash changes
+    - auto_switch: Boolean (default: false) - Enable automatic tab switching
+    - auto_switch_interval: Integer (default: 5000) - Interval in ms
+    - pause_on_hover: Boolean (default: true) - Pause auto-switch on hover
+    - show_progress_bar: Boolean (default: false) - Show progress bar for auto-switch
+    - scroll_active_tab_into_view: Boolean (default: false) - Scroll active tab into view
+    - lazy_load: Boolean (default: false) - Lazy load panel content
+    - arrow_focus_only: Boolean (default: false) - Arrow keys only change focus
+    - classes: String (default: nil) - Additional wrapper classes
+    - tab_list_classes: String (default: nil) - Additional tab list classes
+    - panel_classes: String (default: nil) - Additional classes for all panels
+
+  Tab hash:
+    - title: String (required) - Tab button text
+    - id: String (optional) - Unique ID for URL anchors
+    - icon: String (optional) - SVG icon HTML
+    - meta: String (optional) - Optional meta text/number shown after title
+    - badge: String (optional) - Legacy alias for meta
+    - disabled: Boolean (default: false) - Disable the tab
+    - classes: String (optional) - Additional tab button classes
+%>
+
+<% tabs ||= [] %>
+<% panels ||= [] %>
+<% variant ||= "pills" %>
+<% orientation ||= "horizontal" %>
+<% default_tab ||= 0 %>
+<% url_sync ||= false %>
+<% scroll_to_anchor ||= false %>
+<% auto_switch ||= false %>
+<% auto_switch_interval ||= 5000 %>
+<% pause_on_hover ||= true %>
+<% show_progress_bar ||= false %>
+<% scroll_active_tab_into_view ||= false %>
+<% lazy_load ||= false %>
+<% arrow_focus_only ||= false %>
+<% classes ||= nil %>
+<% tab_list_classes ||= nil %>
+<% panel_classes ||= nil %>
+
+<%
+  # Normalize default tab index to ensure it always points to an enabled tab
+  tabs_count = tabs.size
+  normalized_default_tab = default_tab.to_i
+  normalized_default_tab = [[normalized_default_tab, 0].max, tabs_count - 1].min if tabs_count.positive?
+  normalized_default_tab = 0 if tabs_count.zero?
+
+  if tabs_count.positive? && tabs[normalized_default_tab].is_a?(Hash) && tabs[normalized_default_tab][:disabled]
+    1.upto(tabs_count) do |step|
+      candidate = (normalized_default_tab + step) % tabs_count
+      tab = tabs[candidate]
+      unless tab.is_a?(Hash) && tab[:disabled]
+        normalized_default_tab = candidate
+        break
+      end
+    end
+  end
+
+  # Determine variant-specific styling
+  is_vertical = orientation.to_s == "vertical"
+  normalized_variant = variant.to_s == "bordered" ? "low_contrast" : variant.to_s
+  is_underline = normalized_variant == "underline"
+
+  # Wrapper classes
+  base_wrapper = "w-full"
+  orientation_wrapper = is_vertical ? "flex gap-6 flex-col sm:flex-row" : ""
+  wrapper_classes = [base_wrapper, orientation_wrapper, classes].compact.reject(&:empty?).join(" ")
+
+  # Tab list classes
+  tab_list_base = "opacity-0 transition-opacity duration-200"
+  horizontal_gap = normalized_variant == "low_contrast" ? "gap-1" : "gap-2"
+  tab_list_orientation = is_vertical ? "flex flex-col gap-2 sm:w-48 space-y-1" : "relative inline-grid #{horizontal_gap} items-center justify-center w-full"
+  tab_list_variant = case normalized_variant
+    when "underline"
+      "border-b border-neutral-200 dark:border-neutral-700"
+    when "low_contrast"
+      "p-1 bg-neutral-100/90 border border-neutral-200/80 rounded-xl dark:bg-neutral-800 dark:border-neutral-700"
+    else
+      "p-1 bg-neutral-100 border border-neutral-200 rounded-xl select-none dark:bg-neutral-800 dark:border-neutral-700"
+    end
+  tab_list_grid = is_vertical ? "" : "grid-cols-1 sm:[grid-template-columns:repeat(var(--tabs-columns),minmax(0,1fr))]"
+  tab_list_style = is_vertical ? nil : "--tabs-columns: #{[tabs.size, 1].max};"
+  computed_tab_list_classes = [tab_list_base, tab_list_orientation, tab_list_variant, tab_list_grid, tab_list_classes].compact.reject(&:empty?).join(" ")
+
+  # Active/inactive tab classes based on variant
+  active_tab_classes = case normalized_variant
+    when "underline"
+      "border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white"
+    when "low_contrast"
+      "bg-white text-neutral-900 border-neutral-200 shadow-xs dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-100 dark:shadow-sm"
+    else
+      "bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-900 dark:shadow-sm hover:ring-neutral-800 dark:hover:bg-neutral-50 dark:hover:ring-white hover:text-white dark:hover:text-neutral-900"
+    end
+
+  inactive_tab_classes = case normalized_variant
+    when "underline"
+      "border-b-2 border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+    when "low_contrast"
+      "border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-700/60"
+    else
+      "hover:bg-white/75 ring-1 ring-transparent hover:ring-white dark:hover:bg-neutral-700 dark:hover:ring-neutral-600 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+    end
+
+  # Build data attributes
+  data_attrs = {
+    controller: "tabs",
+    tabs_index_value: normalized_default_tab,
+    tabs_active_tab_class: active_tab_classes,
+    tabs_inactive_tab_class: inactive_tab_classes
+  }
+  data_attrs[:tabs_update_anchor_value] = true if url_sync
+  data_attrs[:tabs_scroll_to_anchor_value] = true if scroll_to_anchor
+  data_attrs[:tabs_auto_switch_value] = true if auto_switch
+  data_attrs[:tabs_auto_switch_interval_value] = auto_switch_interval if auto_switch && auto_switch_interval != 5000
+  data_attrs[:tabs_pause_on_hover_value] = pause_on_hover if auto_switch
+  data_attrs[:tabs_show_progress_bar_value] = true if show_progress_bar
+  data_attrs[:tabs_scroll_active_tab_into_view_value] = true if scroll_active_tab_into_view
+  data_attrs[:tabs_lazy_load_value] = true if lazy_load
+  data_attrs[:tabs_arrow_focus_only_value] = true if arrow_focus_only
+
+  # Panel classes
+  default_panel_classes = panel_classes || "py-6 px-4"
+
+  # Tab button base classes
+  tab_button_border = normalized_variant == "low_contrast" ? "border border-transparent" : ""
+  tab_button_shape = is_underline ? "rounded-none" : "rounded-lg"
+  tab_button_base = "#{tab_button_shape} #{tab_button_border} whitespace-nowrap text-xs font-medium transition flex gap-x-2 items-center justify-center py-2.5 px-3 w-full text-center text-current hover:text-current dark:text-current dark:hover:text-current focus-visible:outline-offset-2 focus-visible:outline-neutral-600 dark:focus-visible:outline-neutral-200"
+  tab_meta_classes = "inline-flex items-center gap-0.5 rounded-full bg-neutral-50 px-1.5 py-0.5 text-[11px] font-medium text-neutral-700 outline outline-neutral-500/20 dark:bg-neutral-400/10 dark:text-neutral-400 dark:outline-neutral-400/25"
+%>
+
+<div class="<%= wrapper_classes %>" <%= tag.attributes(data: data_attrs) %>>
+  <% if auto_switch && show_progress_bar %>
+    <div class="w-full h-1 bg-neutral-200 dark:bg-neutral-700 rounded-full mb-4 overflow-hidden">
+      <div
+        data-tabs-target="progressBar"
+        class="h-full bg-neutral-900 dark:bg-white rounded-full"
+        style="width: 0%"
+      ></div>
+    </div>
+  <% end %>
+
+  <% if is_vertical %>
+    <div class="<%= computed_tab_list_classes %>" data-tabs-target="tabList" role="tablist" aria-orientation="vertical">
+      <% tabs.each_with_index do |tab, index| %>
+        <%
+          tab_id = tab[:id] || "tab-#{object_id}-#{index}"
+          disabled = tab[:disabled] || false
+          tab_meta = tab[:meta].presence || tab[:badge]
+          tab_classes = [tab_button_base, disabled ? "opacity-50 cursor-not-allowed" : "", tab[:classes]].compact.reject(&:empty?).join(" ")
+        %>
+        <button
+          type="button"
+          class="<%= tab_classes %>"
+          id="<%= tab_id %>"
+          data-tabs-target="tab"
+          data-action="click->tabs#change:prevent"
+          role="tab"
+          <% if disabled %>disabled aria-disabled="true"<% end %>
+        >
+          <% if tab[:icon].present? %>
+            <%= tab[:icon].html_safe %>
+          <% end %>
+          <span><%= tab[:title] %></span>
+          <% if tab_meta.present? %>
+            <span class="<%= tab_meta_classes %>"><%= tab_meta %></span>
+          <% end %>
+        </button>
+      <% end %>
+    </div>
+    <div class="flex-1">
+      <% panels.each_with_index do |panel_content, index| %>
+        <div class="<%= default_panel_classes %> <%= 'hidden' if index > 0 %>" data-tabs-target="panel" role="tabpanel">
+          <%= panel_content.respond_to?(:html_safe) ? panel_content.html_safe : panel_content %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="<%= computed_tab_list_classes %>" data-tabs-target="tabList" role="tablist" aria-orientation="horizontal" style="<%= tab_list_style %>">
+      <% tabs.each_with_index do |tab, index| %>
+        <%
+          tab_id = tab[:id] || "tab-#{object_id}-#{index}"
+          disabled = tab[:disabled] || false
+          tab_meta = tab[:meta].presence || tab[:badge]
+          tab_classes = [tab_button_base, disabled ? "opacity-50 cursor-not-allowed" : "", tab[:classes]].compact.reject(&:empty?).join(" ")
+        %>
+        <button
+          type="button"
+          class="<%= tab_classes %>"
+          id="<%= tab_id %>"
+          data-tabs-target="tab"
+          data-action="click->tabs#change:prevent"
+          role="tab"
+          <% if disabled %>disabled aria-disabled="true"<% end %>
+        >
+          <% if tab[:icon].present? %>
+            <%= tab[:icon].html_safe %>
+          <% end %>
+          <span><%= tab[:title] %></span>
+          <% if tab_meta.present? %>
+            <span class="<%= tab_meta_classes %>"><%= tab_meta %></span>
+          <% end %>
+        </button>
+      <% end %>
+    </div>
+
+    <% panels.each_with_index do |panel_content, index| %>
+      <div class="<%= default_panel_classes %> <%= 'hidden' if index > 0 %>" data-tabs-target="panel" role="tabpanel">
+        <%= panel_content.respond_to?(:html_safe) ? panel_content.html_safe : panel_content %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
