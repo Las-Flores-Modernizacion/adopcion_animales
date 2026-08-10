@@ -288,6 +288,8 @@ GEM
       activesupport (= 8.0.5)
       bundler (>= 1.15.0)
       railties (= 8.0.5)
+    rails-blocks-cli (0.1.4)
+      rubyzip (~> 2.3)
     rails-dom-testing (2.3.0)
       activesupport (>= 5.0.0)
       minitest
@@ -351,7 +353,7 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
-    rubyzip (3.3.1)
+    rubyzip (2.4.1)
     securerandom (0.4.1)
     selenium-webdriver (4.44.0)
       base64 (~> 0.2)
@@ -457,6 +459,7 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.5)
+  rails-blocks-cli (~> 0.1.4)
   rails_live_reload
   rubocop-rails-omakase
   selenium-webdriver

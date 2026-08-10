@@ -68,3 +68,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "rails-blocks-cli", "~> 0.1.4"
