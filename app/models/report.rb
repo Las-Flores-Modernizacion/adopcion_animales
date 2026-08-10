@@ -11,8 +11,8 @@ class Report < ApplicationRecord
   scope :published, -> { where(draft: false).or(where(draft: nil)) }
   scope :community, -> { published.where.not(user_id: Current.user.id) }
 
-  validate :tipo_de_archivo_aceptado
-  validate :tamaño_archivo_aceptado
+  validate :accepted_file_types
+  validate :accpeted_file_size
 
   def save_with_location(location_params)
     ActiveRecord::Base.transaction do
@@ -30,7 +30,7 @@ class Report < ApplicationRecord
 
   private
 
-  def tipo_de_archivo_aceptado
+  def accepted_file_types
     extensiones_aceptadas = %w[
       image/jpeg
       image/png
@@ -41,14 +41,13 @@ class Report < ApplicationRecord
 
     if photo.attached?
       tipo_archivo = photo.content_type
-      unless extensiones_aceptadas.include?(tipo_archivo) #GPT dice que unless queda mejor que "if !extensiones_aceptadas.include?(extension_archivo)"
+      unless extensiones_aceptadas.include?(tipo_archivo)
         errors.add(:photo, message: "El formato del archivo no es valido")
       end
     end
   end
 
-  # Se permiten archivos de hasta 20 MB, si es menos o más lo cambiamos.
-  def tamaño_archivo_aceptado
+  def accpeted_file_size
     if photo.attached?
       tamaño_archivo = photo.blob.byte_size
       if tamaño_archivo >= 20.megabytes
