@@ -23,7 +23,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="bg-[#D4A872]">
     <%= render "shared/navbar" %>
     <main class="container mx-auto mt-10 px-5 flex flex-col items-center">
       <% flash.each do |type, msg| %>
@@ -33,5 +33,6 @@
       <% end %>
       <%= yield %>
     </main>
+    
   </body>
 </html>
