@@ -1,9 +1,9 @@
-<%= form_with(model: report, class: "space-y-6") do |form| %>
-  <% if report.errors.any? %>
+<%= form_with(model: @report, class: "space-y-6") do |form| %>
+  <% if @report.errors.any? %>
     <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800">
       <h3 class="text-sm font-medium text-red-800 dark:text-red-400">Por favor revisa los siguientes errores:</h3>
       <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc pl-5">
-        <% report.errors.full_messages.each do |message| %>
+        <% @report.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
       </ul>
@@ -11,11 +11,11 @@
   <% end %>
 
   <!-- Muestra de Fotos Adjuntas en el Paso 1 -->
-  <% if report.photo.attached? %>
+  <% if @report.photo.attached? %>
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Fotos adjuntas</h3>
       <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
-        <% report.photo.each do |p| %>
+        <% @report.photo.each do |p| %>
           <div class="aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-neutral-200 dark:border-neutral-800">
             <%= image_tag p, class: "w-full h-full object-cover" %>
           </div>
