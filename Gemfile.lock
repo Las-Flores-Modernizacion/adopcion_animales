@@ -353,6 +353,9 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
+    ruby-vips (2.3.0)
+      ffi (~> 1.12)
+      logger
     rubyzip (2.4.1)
     securerandom (0.4.1)
     selenium-webdriver (4.44.0)
@@ -462,6 +465,7 @@ DEPENDENCIES
   rails-blocks-cli (~> 0.1.4)
   rails_live_reload
   rubocop-rails-omakase
+  ruby-vips (~> 2.3)
   selenium-webdriver
   solid_cable
   solid_cache

@@ -70,3 +70,5 @@ group :test do
 end
 
 gem "rails-blocks-cli", "~> 0.1.4"
+
+gem "ruby-vips", "~> 2.3"
