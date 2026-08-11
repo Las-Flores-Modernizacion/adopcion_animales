@@ -1,5 +1,5 @@
 class Animal < ApplicationRecord
-  belongs_to :report, optional: true
+  belongs_to :report
 
   enum :size, { pequeño: 0, mediano: 1, grande: 2 }
   enum :species, { perro: 0, gato: 1 }
@@ -10,7 +10,8 @@ class Animal < ApplicationRecord
   # Validaciones
   validates :color,
     format: { with: /\A[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+\z/, message: "Solo se permiten letras." },
-    length: { minimum: 3, maximum: 40, message: "Solo se permiten colores con más de 3 letras y menos de 41" }
+    length: { minimum: 3, maximum: 40, message: "Solo se permiten colores con más de 3 letras y menos de 41" },
+    allow_blank: true
 
   validates :age, numericality: { only_integer: true, less_than_or_equal_to: 25 }
 
@@ -20,8 +21,9 @@ class Animal < ApplicationRecord
 
   validates :race,
     format: { with: /\A[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+\z/, message: "Solo se permiten letras." },
-    length: { maximum: 40, message: "Como máximo puedes escribir 40 carácteres" }
-  validates :unique_detail,
+    length: { maximum: 40, message: "Como máximo puedes escribir 40 carácteres" },
+    allow_blank: true
 
+  validates :unique_detail,
     length: { maximum: 40, message: "Como máximo puedes escribir 40 carácteres" }
 end

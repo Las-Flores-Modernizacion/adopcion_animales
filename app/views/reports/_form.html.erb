@@ -1,0 +1,117 @@
+<%= form_with(model: report, class: "space-y-6") do |form| %>
+  <% if report.errors.any? %>
+    <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800">
+      <h3 class="text-sm font-medium text-red-800 dark:text-red-400">Por favor revisa los siguientes errores:</h3>
+      <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc pl-5">
+        <% report.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form.fields_for :animal do |animal_form| %>
+    <!-- Tarjeta: Fotos -->
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Fotografías</h3>
+      <%= render "shared/components/forms/form_group", label: "Añadir fotos", name: "report[photo][]", helper_text: "Una imagen vale más que mil palabras. Sube hasta 20 MB." do %>
+        <%= form.file_field :photo, multiple: true, accept: "image/jpeg, image/png, image/webp, image/avif, image/heic", class: "w-full text-sm text-neutral-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-neutral-100 file:text-neutral-700 hover:file:bg-neutral-200 dark:file:bg-neutral-800 dark:file:text-neutral-300 dark:hover:file:bg-neutral-700 cursor-pointer" %>
+      <% end %>
+    </div>
+
+    <!-- Tarjeta: Identificación Básica -->
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Identificación</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <%= render "shared/components/forms/form_group", label: "Especie", name: "report[animal_attributes][species]" do %>
+          <%= animal_form.select :species, Animal.species.keys.map { |s| [s.titleize, s] }, { prompt: "Selecciona una..." }, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
+        <% end %>
+
+        <%= render "shared/components/forms/form_group", label: "Tamaño aproximado", name: "report[animal_attributes][size]" do %>
+          <%= animal_form.select :size, Animal.sizes.keys.map { |s| [s.titleize, s] }, { prompt: "Selecciona uno..." }, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
+        <% end %>
+
+        <%= render "shared/components/forms/form_group", label: "Color principal", name: "report[animal_attributes][color]", helper_text: "Ej. Negro con manchas blancas" do %>
+          <%= animal_form.text_field :color, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
+        <% end %>
+
+        <%= render "shared/components/forms/form_group", label: "Raza (si la sabes)", name: "report[animal_attributes][race]" do %>
+          <%= animal_form.text_field :race, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Tarjeta: Estado y Comportamiento -->
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Estado y Comportamiento</h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="flex items-start p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+          <div class="flex items-center h-5">
+            <%= animal_form.check_box :urgent, class: "rounded border-neutral-300 text-red-600 focus:ring-red-600 size-5" %>
+          </div>
+          <div class="ml-3 text-sm">
+            <span class="font-medium text-neutral-900 dark:text-white block">Caso Urgente</span>
+            <span class="text-neutral-500 text-xs">Requiere asistencia inmediata</span>
+          </div>
+        </label>
+
+        <label class="flex items-start p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+          <div class="flex items-center h-5">
+            <%= animal_form.check_box :is_hurt, class: "rounded border-neutral-300 text-orange-600 focus:ring-orange-600 size-5" %>
+          </div>
+          <div class="ml-3 text-sm">
+            <span class="font-medium text-neutral-900 dark:text-white block">Está herido</span>
+            <span class="text-neutral-500 text-xs">Presenta lesiones visibles</span>
+          </div>
+        </label>
+
+        <label class="flex items-start p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+          <div class="flex items-center h-5">
+            <%= animal_form.check_box :aggressive, class: "rounded border-neutral-300 text-neutral-900 dark:text-white focus:ring-neutral-900 size-5" %>
+          </div>
+          <div class="ml-3 text-sm">
+            <span class="font-medium text-neutral-900 dark:text-white block">Comportamiento agresivo</span>
+            <span class="text-neutral-500 text-xs">Precaución al acercarse</span>
+          </div>
+        </label>
+
+        <label class="flex items-start p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+          <div class="flex items-center h-5">
+            <%= animal_form.check_box :is_anxious, class: "rounded border-neutral-300 text-neutral-900 dark:text-white focus:ring-neutral-900 size-5" %>
+          </div>
+          <div class="ml-3 text-sm">
+            <span class="font-medium text-neutral-900 dark:text-white block">Asustado o ansioso</span>
+            <span class="text-neutral-500 text-xs">Tiembla o se esconde</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Tarjeta: Detalles extra -->
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Detalles adicionales</h3>
+
+      <%= render "shared/components/form_group", label: "Rasgos distintivos", name: "report[animal_attributes][unique_detail]", helper_text: "Ej. Le falta media oreja, tiene un collar rojo sin chapa, cojea, etc." do %>
+        <%= animal_form.text_area :unique_detail, rows: 3, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Botones de acción -->
+  <div class="flex flex-col sm:flex-row justify-end gap-3 pt-2">
+    <%= render "shared/components/buttons/button",
+      text: "Descartar",
+      href: reports_path,
+      variant: "secondary",
+      style: "fancy"
+    %>
+
+    <%= render "shared/components/buttons/button",
+      text: "Publicar",
+      type: "submit",
+      style: "fancy"
+    %>
+  </div>
+<% end %>

@@ -1,0 +1,73 @@
+<% content_for :title, "Nuevo Reporte - Paso 1" %>
+
+<div class="max-w-2xl mx-auto py-8 px-4 sm:px-6">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Reportar Animal</h1>
+    <p class="text-neutral-500 mt-2">Sube una o varias fotos del animal y confirma tu ubicación para continuar.</p>
+  </div>
+
+  <%= form_with(
+    model: @report,
+    url: reports_path,
+    method: :post,
+    class: "space-y-6",
+    data: { controller: "gps" }
+  ) do |form| %>
+
+    <% if @report.errors.any? %>
+      <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800">
+        <h3 class="text-sm font-medium text-red-800 dark:text-red-400">Por favor revisa los siguientes errores:</h3>
+        <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc pl-5">
+          <% @report.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Coordenadas ocultas -->
+    <%= hidden_field_tag "location[browser_lat]", nil, data: { gps_target: "lat" } %>
+    <%= hidden_field_tag "location[browser_lng]", nil, data: { gps_target: "lng" } %>
+
+    <!-- Fotos -->
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Fotografías del Animal</h3>
+      <%= render "shared/components/forms/form_group", label: "Añadir fotos (Requerido)", name: "report[photo][]", helper_text: "Sube imágenes del animal para su identificación." do %>
+        <%= form.file_field :photo,
+            multiple: true,
+            required: true,
+            accept: "image/jpeg, image/png, image/webp, image/avif, image/heic",
+            class: "w-full text-sm text-neutral-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-neutral-100 file:text-neutral-700 hover:file:bg-neutral-200 dark:file:bg-neutral-800 dark:file:text-neutral-300 dark:hover:file:bg-neutral-700 cursor-pointer" %>
+      <% end %>
+    </div>
+
+    <!-- Panel de Estado GPS (Visible por defecto) -->
+    <div data-gps-target="warning" class="p-4 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div data-gps-target="message" class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div class="text-sm">
+          <strong class="font-semibold block sm:inline">Sin ubicación GPS:</strong> Se requiere obtener tu ubicación actual para enviar el reporte.
+        </div>
+      </div>
+
+      <button type="button"
+              data-gps-target="retry"
+              data-action="click->gps#checkLocation"
+              class="px-4 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 whitespace-nowrap">
+        Obtener ubicación GPS
+      </button>
+    </div>
+
+    <!-- Botón de Envío -->
+    <div class="flex justify-end gap-3 pt-2">
+      <button type="submit"
+              data-gps-target="submit"
+              disabled
+              class="px-6 py-2.5 rounded-xl font-medium text-sm text-white bg-neutral-900 dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all opacity-50 cursor-not-allowed pointer-events-none">
+        Siguiente paso
+      </button>
+    </div>
+  <% end %>
+</div>
