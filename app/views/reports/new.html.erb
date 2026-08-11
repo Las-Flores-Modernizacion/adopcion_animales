@@ -42,7 +42,7 @@
           direct_upload: true,
           data: {
             "image-preview-target": "master",
-            action: "change->image-preview#preview"
+            action: "change->image-preview#renderPreviews"
           },
           class: "hidden" %>
 
@@ -88,7 +88,7 @@
                 data: { action: "click->image-preview#openGallery" } %>
 
             <input type="file"
-              accept="image/jpeg, image/png, image/webp, image/avif, image/heic"
+              accept="image/*"
               multiple="multiple"
               data-compressor-target="input"
               data-image-preview-target="galleryInput"

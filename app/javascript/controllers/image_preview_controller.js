@@ -3,10 +3,6 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["master", "previewContainer", "cameraInput", "galleryInput"]
 
-  connect() {
-    this.dt = new DataTransfer()
-  }
-
   openCamera(event) {
     event.preventDefault()
     if (this.hasCameraInputTarget) this.cameraInputTarget.click()
@@ -17,58 +13,14 @@ export default class extends Controller {
     if (this.hasGalleryInputTarget) this.galleryInputTarget.click()
   }
 
-  preview(event) {
-    const input = event.target
-
-    for (let file of input.files) {
-      this.dt.items.add(file)
-    }
-
-    this.syncMaster()
-    this.renderPreviews()
-
-    const clone = input.cloneNode()
-    clone.value = ""
-    input.parentNode.replaceChild(clone, input)
-
-    input.style.display = "none"
-    input.removeAttribute("id")
-    input.removeAttribute("name")
-    input.removeAttribute("data-image-preview-target")
-    input.removeAttribute("data-compressor-target")
-    input.removeAttribute("data-action")
-    document.body.appendChild(input)
-  }
-
-  remove(event) {
-    event.preventDefault()
-    const indexToRemove = parseInt(event.currentTarget.dataset.index)
-    const newDt = new DataTransfer()
-
-    Array.from(this.dt.files).forEach((file, index) => {
-      if (index !== indexToRemove) {
-        newDt.items.add(file)
-      }
-    })
-
-    this.dt = newDt
-    this.syncMaster()
-    this.renderPreviews()
-  }
-
-  syncMaster() {
-    if (this.hasMasterTarget) {
-      this.masterTarget.files = this.dt.files
-    }
-  }
-
   renderPreviews() {
     this.previewContainerTarget.innerHTML = ""
+    const files = this.hasMasterTarget ? Array.from(this.masterTarget.files) : []
 
-    if (this.dt.files.length > 0) {
+    if (files.length > 0) {
       this.previewContainerTarget.classList.remove("hidden")
 
-      Array.from(this.dt.files).forEach((file, index) => {
+      files.forEach((file, index) => {
         if (!file.type.startsWith("image/")) return
 
         const reader = new FileReader()
@@ -94,5 +46,20 @@ export default class extends Controller {
     } else {
       this.previewContainerTarget.classList.add("hidden")
     }
+  }
+
+  remove(event) {
+    event.preventDefault()
+    const indexToRemove = parseInt(event.currentTarget.dataset.index)
+    const dt = new DataTransfer()
+
+    Array.from(this.masterTarget.files).forEach((file, index) => {
+      if (index !== indexToRemove) {
+        dt.items.add(file)
+      }
+    })
+
+    this.masterTarget.files = dt.files
+    this.renderPreviews()
   }
 }
