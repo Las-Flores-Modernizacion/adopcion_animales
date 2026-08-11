@@ -48,7 +48,7 @@ export default class extends Controller {
     this.latTarget.value = position.coords.latitude
     this.lngTarget.value = position.coords.longitude
 
-    this.showSuccess(`Ubicación GPS obtenida correctamente (precisión: ~${Math.round(accuracy)}m).`)
+    this.warningTarget.classList.add('hidden')
     this.enableSubmit()
   }
 
@@ -85,20 +85,6 @@ export default class extends Controller {
         <svg class="animate-spin h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span class="text-sm font-medium">${msg}</span>
-      </div>
-    `
-    if (this.hasRetryTarget) this.retryTarget.classList.add('hidden')
-  }
-
-  showSuccess(msg) {
-    this.warningTarget.classList.remove('hidden')
-    this.warningTarget.className = "p-4 rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 flex items-center justify-between gap-4"
-    this.messageTarget.innerHTML = `
-      <div class="flex items-center gap-3">
-        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
         </svg>
         <span class="text-sm font-medium">${msg}</span>
       </div>
