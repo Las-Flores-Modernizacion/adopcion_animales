@@ -21,7 +21,7 @@ class Report < ApplicationRecord
       latitude: location_params[:browser_lat],
       longitude: location_params[:browser_lng]
     )
-    photo.attach(photos) if photos.present?
+    self.photo.attach(photos) if photos.present?
 
     save
   end
