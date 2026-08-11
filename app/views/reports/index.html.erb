@@ -25,7 +25,7 @@
             <!-- Card Header / Image -->
             <div class="relative h-48 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0">
               <% if report.photo.attached? %>
-                <%= image_tag report.photo, class: "w-full h-full object-cover" %>
+                <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
               <% else %>
                 <div class="w-full h-full flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,7 +102,7 @@
             <!-- Card Header / Image -->
             <div class="relative h-48 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0">
               <% if report.photo.attached? %>
-                <%= image_tag report.photo, class: "w-full h-full object-cover" %>
+                <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
               <% else %>
                 <div class="w-full h-full flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
