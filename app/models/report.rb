@@ -31,7 +31,7 @@ class Report < ApplicationRecord
   private
 
   def photo_presence
-    errors.add(:photo, "Debes adjuntar al menos una fotografía del animal.") unless photo.attached?
+    errors.add(:photo, "debes adjuntar al menos una fotografía del animal.") unless photo.attached?
   end
 
   def accepted_file_types
@@ -41,7 +41,7 @@ class Report < ApplicationRecord
       photo.each do |p|
         content_type = p.blob&.content_type || p.content_type
         unless extensiones_aceptadas.include?(content_type)
-          errors.add(:photo, "El formato de una de las imágenes no es válido")
+          errors.add(:photo, "el formato de una de las imágenes no es válido")
         end
       end
     end
@@ -52,7 +52,7 @@ class Report < ApplicationRecord
       photo.each do |p|
         byte_size = p.blob&.byte_size || p.size
         if byte_size && byte_size >= 20.megabytes
-          errors.add(:photo, "Cada imagen debe pesar menos de 20 MB")
+          errors.add(:photo, "cada imagen debe pesar menos de 20 MB")
         end
       end
     end
