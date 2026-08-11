@@ -1,10 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["master", "previewContainer"]
+  static targets = ["master", "previewContainer", "cameraInput", "galleryInput"]
 
   connect() {
     this.dt = new DataTransfer()
+  }
+
+  openCamera(event) {
+    event.preventDefault()
+    if (this.hasCameraInputTarget) this.cameraInputTarget.click()
+  }
+
+  openGallery(event) {
+    event.preventDefault()
+    if (this.hasGalleryInputTarget) this.galleryInputTarget.click()
   }
 
   preview(event) {

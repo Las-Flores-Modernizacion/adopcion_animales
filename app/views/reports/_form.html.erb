@@ -20,60 +20,105 @@
     </div>
   </div>
 
-  <!-- Contenedor de Selección de Fotos -->
-  <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4" data-controller="image-preview">
-    <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Fotografías del Animal (Requerido)</h3>
-
-    <!-- Contenedor dinámico de previsualización JS -->
-    <div data-image-preview-target="previewContainer" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
+  <!-- Tarjeta: Visualización y Carga de Fotografías -->
+  <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-6" data-controller="image-preview">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Fotografías del Animal</h3>
+        <p class="text-sm text-neutral-500 mt-1">Revisa las imágenes guardadas o añade más para facilitar la identificación.</p>
+      </div>
+      <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+        Opcional (Paso 2)
+      </span>
     </div>
 
-    <%= form.file_field :photo,
-        multiple: true,
-        direct_upload: true,
-        data: { image_preview_target: "master" },
-        class: "hidden" %>
+    <!-- Muestra solo de fotos persistidas en BD -->
+    <% saved_photos = report.photo.select(&:persisted?) %>
+    <% if saved_photos.any? %>
+      <div class="space-y-3">
+        <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 block">
+          Fotos adjuntas (<%= saved_photos.count %>)
+        </span>
 
-    <!-- UI Compacta de Subida -->
-    <div class="p-6 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/30 text-center flex flex-col items-center justify-center gap-4 transition-colors hover:border-neutral-400 dark:hover:border-neutral-500">
-      <div class="p-3 rounded-full bg-neutral-200/50 dark:bg-neutral-700/50 text-neutral-600 dark:text-neutral-300">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
+        <% slides = saved_photos.map do |p|
+          {
+            content: image_tag(p, class: "w-full h-48 sm:h-56 object-cover rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xs")
+          }
+        end %>
+
+        <%= render "shared/components/carousel/carousel",
+            slides: slides,
+            slide_size: "third",
+            dots: true,
+            buttons: true
+        %>
       </div>
-      <div>
-        <p class="text-sm font-medium text-neutral-900 dark:text-white">Selecciona o toma fotos del animal</p>
-        <p class="text-xs text-neutral-500 mt-1">Formatos: JPG, PNG, WEBP, AVIF, HEIC</p>
+    <% end %>
+
+    <!-- Opciones para agregar más fotos -->
+    <div class="border-t border-neutral-100 dark:border-neutral-800 pt-5 space-y-4">
+      <label class="block text-sm font-medium text-neutral-900 dark:text-white">
+        Agregar imágenes <span class="text-xs text-neutral-400 font-normal">(Opcional)</span>
+      </label>
+
+      <!-- Contenedor dinámico de previsualización JS -->
+      <div data-image-preview-target="previewContainer" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
       </div>
 
-      <div class="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
-        <!-- Botón Cámara -->
-        <div data-controller="compressor">
-          <label class="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-neutral-700 bg-white border border-neutral-300 shadow-sm hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600 dark:hover:bg-neutral-700 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><circle cx="12" cy="13" r="3" stroke-width="2" /></svg>
-            Tomar foto
-            <input type="file"
-                    accept="image/*"
-                    capture="environment"
-                    multiple="multiple"
-                    data-compressor-target="input"
-                    data-action="change->compressor#compress change->image-preview#preview"
-                    class="hidden" />
-          </label>
+      <!-- INPUT MAESTRO -->
+      <%= form.file_field :photo,
+          multiple: true,
+          direct_upload: true,
+          data: { image_preview_target: "master" },
+          class: "hidden" %>
+
+      <!-- UI Compacta de Subida con Componente Button -->
+      <div class="p-6 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/30 text-center flex flex-col items-center justify-center gap-4 transition-colors hover:border-neutral-400 dark:hover:border-neutral-500">
+        <div class="p-3 rounded-full bg-neutral-200/50 dark:bg-neutral-700/50 text-neutral-600 dark:text-neutral-300">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-neutral-900 dark:text-white">Selecciona o toma fotos del animal</p>
+          <p class="text-xs text-neutral-500 mt-1">Formatos: JPG, PNG, WEBP, AVIF, HEIC</p>
         </div>
 
-        <!-- Botón Galería -->
-        <div data-controller="compressor">
-          <label class="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-white bg-neutral-900 dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 shadow-sm transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-            Galería
+        <div class="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
+          <!-- Botón Cámara (Componente Button) -->
+          <div data-controller="compressor">
+            <%= render "shared/components/buttons/button",
+                text: "Tomar foto",
+                variant: "secondary",
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><circle cx="12" cy="13" r="3" stroke-width="2" /></svg>',
+                data: { action: "click->image-preview#openCamera" } %>
+
             <input type="file"
-                    accept="image/jpeg, image/png, image/webp, image/avif, image/heic"
-                    multiple="multiple"
-                    data-compressor-target="input"
-                    data-action="change->compressor#compress change->image-preview#preview"
-                    class="hidden" />
-          </label>
+                   accept="image/*"
+                   capture="environment"
+                   multiple="multiple"
+                   data-compressor-target="input"
+                   data-image-preview-target="cameraInput"
+                   data-action="change->compressor#compress change->image-preview#preview"
+                   class="hidden" />
+          </div>
+
+          <!-- Botón Galería (Componente Button) -->
+          <div data-controller="compressor">
+            <%= render "shared/components/buttons/button",
+                text: "Galería",
+                variant: "primary",
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>',
+                data: { action: "click->image-preview#openGallery" } %>
+
+            <input type="file"
+                   accept="image/jpeg, image/png, image/webp, image/avif, image/heic"
+                   multiple="multiple"
+                   data-compressor-target="input"
+                   data-image-preview-target="galleryInput"
+                   data-action="change->compressor#compress change->image-preview#preview"
+                   class="hidden" />
+          </div>
         </div>
       </div>
     </div>
@@ -85,34 +130,30 @@
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Identificación del Animal</h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <%= render "shared/components/forms/form_group",
-            label: "Especie *",
+        <%= render "shared/components/forms/select",
+            label: "Especie",
             name: "report[animal_attributes][species]",
-            helper_text: "Requerido" do %>
-          <%= animal_form.select :species,
-              Animal.species.keys.map { |s| [s.titleize, s] },
-              { prompt: "Selecciona una..." },
-              required: true,
-              class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
-        <% end %>
+            options: Animal.species.keys.map { |s| [s.titleize, s] },
+            selected: animal_form.object.species,
+            placeholder: "Selecciona una...",
+            required: true,
+            description: "Requerido" %>
 
-        <%= render "shared/components/forms/form_group",
-            label: "Tamaño aproximado *",
+        <%= render "shared/components/forms/select",
+            label: "Tamaño aproximado",
             name: "report[animal_attributes][size]",
-            helper_text: "Requerido" do %>
-          <%= animal_form.select :size,
-              Animal.sizes.keys.map { |s| [s.titleize, s] },
-              { prompt: "Selecciona uno..." },
-              required: true,
-              class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
-        <% end %>
+            options: Animal.sizes.keys.map { |s| [s.titleize, s] },
+            selected: animal_form.object.size,
+            placeholder: "Selecciona uno...",
+            required: true,
+            description: "Requerido" %>
 
         <%= render "shared/components/forms/form_group",
             label: "Color principal (Opcional)",
             name: "report[animal_attributes][color]",
             helper_text: "Ej. Negro con manchas blancas" do %>
           <%= animal_form.text_field :color,
-              class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
+              class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white text-sm" %>
         <% end %>
 
         <%= render "shared/components/forms/form_group",
@@ -120,7 +161,7 @@
             name: "report[animal_attributes][race]",
             helper_text: "Si la conoces" do %>
           <%= animal_form.text_field :race,
-              class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
+              class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white text-sm" %>
         <% end %>
       </div>
     </div>
@@ -133,45 +174,41 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <label class="flex items-start p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-          <div class="flex items-center h-5">
-            <%= animal_form.check_box :urgent, class: "rounded border-neutral-300 text-red-600 focus:ring-red-600 size-5" %>
-          </div>
-          <div class="ml-3 text-sm">
-            <span class="font-medium text-neutral-900 dark:text-white block">Caso Urgente</span>
-            <span class="text-neutral-500 text-xs">Requiere asistencia inmediata</span>
-          </div>
-        </label>
+        <%= animal_form.hidden_field :urgent, value: "0" %>
+        <%= render "shared/components/forms/checkbox",
+            label: "Caso Urgente",
+            description: "Requiere asistencia inmediata",
+            name: "report[animal_attributes][urgent]",
+            value: "1",
+            checked: animal_form.object.urgent,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
 
-        <label class="flex items-start p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-          <div class="flex items-center h-5">
-            <%= animal_form.check_box :is_hurt, class: "rounded border-neutral-300 text-orange-600 focus:ring-orange-600 size-5" %>
-          </div>
-          <div class="ml-3 text-sm">
-            <span class="font-medium text-neutral-900 dark:text-white block">Está herido</span>
-            <span class="text-neutral-500 text-xs">Presenta lesiones visibles</span>
-          </div>
-        </label>
+        <%= animal_form.hidden_field :is_hurt, value: "0" %>
+        <%= render "shared/components/forms/checkbox",
+            label: "Está herido",
+            description: "Presenta lesiones visibles",
+            name: "report[animal_attributes][is_hurt]",
+            value: "1",
+            checked: animal_form.object.is_hurt,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
 
-        <label class="flex items-start p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-          <div class="flex items-center h-5">
-            <%= animal_form.check_box :aggressive, class: "rounded border-neutral-300 text-neutral-900 dark:text-white focus:ring-neutral-900 size-5" %>
-          </div>
-          <div class="ml-3 text-sm">
-            <span class="font-medium text-neutral-900 dark:text-white block">Comportamiento agresivo</span>
-            <span class="text-neutral-500 text-xs">Precaución al acercarse</span>
-          </div>
-        </label>
+        <%= animal_form.hidden_field :aggressive, value: "0" %>
+        <%= render "shared/components/forms/checkbox",
+            label: "Comportamiento agresivo",
+            description: "Precaución al acercarse",
+            name: "report[animal_attributes][aggressive]",
+            value: "1",
+            checked: animal_form.object.aggressive,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
 
-        <label class="flex items-start p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-          <div class="flex items-center h-5">
-            <%= animal_form.check_box :is_anxious, class: "rounded border-neutral-300 text-neutral-900 dark:text-white focus:ring-neutral-900 size-5" %>
-          </div>
-          <div class="ml-3 text-sm">
-            <span class="font-medium text-neutral-900 dark:text-white block">Asustado o ansioso</span>
-            <span class="text-neutral-500 text-xs">Tiembla o se esconde</span>
-          </div>
-        </label>
+        <%= animal_form.hidden_field :is_anxious, value: "0" %>
+        <%= render "shared/components/forms/checkbox",
+            label: "Asustado o ansioso",
+            description: "Tiembla o se esconde",
+            name: "report[animal_attributes][is_anxious]",
+            value: "1",
+            checked: animal_form.object.is_anxious,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
       </div>
     </div>
 
@@ -188,7 +225,7 @@
           helper_text: "Ej. Le falta media oreja, tiene un collar rojo sin chapa, cojea, etc." do %>
         <%= animal_form.text_area :unique_detail,
             rows: 3,
-            class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
+            class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white text-sm" %>
       <% end %>
     </div>
   <% end %>
@@ -198,7 +235,8 @@
     <%= render "shared/components/buttons/button",
       text: "Guardar y publicar reporte",
       type: "submit",
-      style: "fancy"
+      style: "fancy",
+      variant: "primary"
     %>
   </div>
 <% end %>

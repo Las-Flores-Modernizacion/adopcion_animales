@@ -29,7 +29,7 @@
     <%= hidden_field_tag "location[browser_lat]", nil, data: { gps_target: "lat" } %>
     <%= hidden_field_tag "location[browser_lng]", nil, data: { gps_target: "lng" } %>
 
-    <!-- Contenedor de Selección de Fotos -->
+    <!-- Selección de Fotos -->
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4" data-controller="image-preview">
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Fotografías del Animal (Requerido)</h3>
 
@@ -37,13 +37,14 @@
       <div data-image-preview-target="previewContainer" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
       </div>
 
+      <!-- INPUT MAESTRO -->
       <%= form.file_field :photo,
           multiple: true,
           direct_upload: true,
           data: { image_preview_target: "master" },
           class: "hidden" %>
 
-      <!-- UI Compacta de Subida -->
+      <!-- UI Compacta de Subida con Componente Button -->
       <div class="p-6 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/30 text-center flex flex-col items-center justify-center gap-4 transition-colors hover:border-neutral-400 dark:hover:border-neutral-500">
         <div class="p-3 rounded-full bg-neutral-200/50 dark:bg-neutral-700/50 text-neutral-600 dark:text-neutral-300">
           <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,33 +57,41 @@
         </div>
 
         <div class="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
-          <!-- Botón Cámara -->
+          <!-- Botón Cámara (Componente Button) -->
           <div data-controller="compressor">
-            <label class="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-neutral-700 bg-white border border-neutral-300 shadow-sm hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600 dark:hover:bg-neutral-700 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><circle cx="12" cy="13" r="3" stroke-width="2" /></svg>
-              Tomar foto
-              <input type="file"
-                      accept="image/*"
-                      capture="environment"
-                      multiple="multiple"
-                      data-compressor-target="input"
-                      data-action="change->compressor#compress change->image-preview#preview"
-                      class="hidden" />
-            </label>
+            <%= render "shared/components/buttons/button",
+                text: "Tomar foto",
+                variant: "secondary",
+                style: "fancy",
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><circle cx="12" cy="13" r="3" stroke-width="2" /></svg>',
+                data: { action: "click->image-preview#openCamera" } %>
+
+            <input type="file"
+                   accept="image/*"
+                   capture="environment"
+                   multiple="multiple"
+                   data-compressor-target="input"
+                   data-image-preview-target="cameraInput"
+                   data-action="change->compressor#compress change->image-preview#preview"
+                   class="hidden" />
           </div>
 
-          <!-- Botón Galería -->
+          <!-- Botón Galería (Componente Button) -->
           <div data-controller="compressor">
-            <label class="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-white bg-neutral-900 dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 shadow-sm transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              Galería
-              <input type="file"
-                      accept="image/jpeg, image/png, image/webp, image/avif, image/heic"
-                      multiple="multiple"
-                      data-compressor-target="input"
-                      data-action="change->compressor#compress change->image-preview#preview"
-                      class="hidden" />
-            </label>
+            <%= render "shared/components/buttons/button",
+                text: "Galería",
+                variant: "primary",
+                style: "fancy",
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>',
+                data: { action: "click->image-preview#openGallery" } %>
+
+            <input type="file"
+                   accept="image/jpeg, image/png, image/webp, image/avif, image/heic"
+                   multiple="multiple"
+                   data-compressor-target="input"
+                   data-image-preview-target="galleryInput"
+                   data-action="change->compressor#compress change->image-preview#preview"
+                   class="hidden" />
           </div>
         </div>
       </div>
@@ -99,22 +108,27 @@
         </div>
       </div>
 
-      <button type="button"
-              data-gps-target="retry"
-              data-action="click->gps#checkLocation"
-              class="px-4 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 whitespace-nowrap">
-        Obtener ubicación GPS
-      </button>
+      <%= render "shared/components/buttons/button",
+          text: "Obtener ubicación GPS",
+          type: "button",
+          variant: "warning",
+          style: "fancy",
+          size: "sm",
+          data: { gps_target: "retry", action: "click->gps#checkLocation" }
+      %>
     </div>
 
     <!-- Botón de Envío -->
     <div class="flex justify-end gap-3 pt-2">
-      <button type="submit"
-              data-gps-target="submit"
-              disabled
-              class="px-6 py-2.5 rounded-xl font-medium text-sm text-white bg-neutral-900 dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all opacity-50 cursor-not-allowed pointer-events-none">
-        Siguiente paso
-      </button>
+      <%= render "shared/components/buttons/button",
+          text: "Siguiente paso",
+          type: "submit",
+          style: "fancy",
+          variant: "primary",
+          disabled: true,
+          data: { gps_target: "submit" },
+          classes: "pointer-events-none"
+      %>
     </div>
   <% end %>
 </div>
