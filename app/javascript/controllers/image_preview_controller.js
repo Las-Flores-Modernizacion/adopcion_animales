@@ -10,7 +10,6 @@ export default class extends Controller {
   preview(event) {
     const input = event.target
 
-    this.dt = new DataTransfer() 
     for (let file of input.files) {
       this.dt.items.add(file)
     }
@@ -37,8 +36,13 @@ export default class extends Controller {
   }
 
   syncInputs() {
-    this.inputTargets.forEach(input => {
-      input.files = this.dt.files
+    this.inputTargets.forEach((input, index) => {
+      if (index === 0) {
+        input.files = this.dt.files
+        input.name = "report[photo][]"
+      } else {
+        input.name = ""
+      }
     })
   }
 
@@ -57,10 +61,9 @@ export default class extends Controller {
             <div class="relative group aspect-square">
               <img src="${e.target.result}" class="w-full h-full object-cover rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm" alt="Previsualización" />
 
-              <!-- Botón X para eliminar -->
-              <button type="button" 
-                      data-action="click->image-preview#remove" 
-                      data-index="${index}" 
+              <button type="button"
+                      data-action="click->image-preview#remove"
+                      data-index="${index}"
                       class="absolute top-2 right-2 bg-neutral-900/70 hover:bg-red-600 text-white rounded-full p-1.5 backdrop-blur-sm transition-colors shadow-sm"
                       title="Quitar imagen">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
