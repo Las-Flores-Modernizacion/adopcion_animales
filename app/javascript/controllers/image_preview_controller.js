@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["input", "previewContainer"]
+  static targets = ["master", "previewContainer"]
 
   connect() {
     this.dt = new DataTransfer()
@@ -14,13 +14,24 @@ export default class extends Controller {
       this.dt.items.add(file)
     }
 
-    this.syncInputs()
+    this.syncMaster()
     this.renderPreviews()
+
+    const clone = input.cloneNode()
+    clone.value = ""
+    input.parentNode.replaceChild(clone, input)
+
+    input.style.display = "none"
+    input.removeAttribute("id")
+    input.removeAttribute("name")
+    input.removeAttribute("data-image-preview-target")
+    input.removeAttribute("data-compressor-target")
+    input.removeAttribute("data-action")
+    document.body.appendChild(input)
   }
 
   remove(event) {
     event.preventDefault()
-
     const indexToRemove = parseInt(event.currentTarget.dataset.index)
     const newDt = new DataTransfer()
 
@@ -31,19 +42,14 @@ export default class extends Controller {
     })
 
     this.dt = newDt
-    this.syncInputs()
+    this.syncMaster()
     this.renderPreviews()
   }
 
-  syncInputs() {
-    this.inputTargets.forEach((input, index) => {
-      if (index === 0) {
-        input.files = this.dt.files
-        input.name = "report[photo][]"
-      } else {
-        input.name = ""
-      }
-    })
+  syncMaster() {
+    if (this.hasMasterTarget) {
+      this.masterTarget.files = this.dt.files
+    }
   }
 
   renderPreviews() {
@@ -60,7 +66,6 @@ export default class extends Controller {
           const imgHTML = `
             <div class="relative group aspect-square">
               <img src="${e.target.result}" class="w-full h-full object-cover rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm" alt="Previsualización" />
-
               <button type="button"
                       data-action="click->image-preview#remove"
                       data-index="${index}"
