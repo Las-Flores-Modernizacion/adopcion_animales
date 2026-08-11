@@ -17,14 +17,15 @@
       <p class="text-sm text-neutral-500 mt-1">Revisa las imágenes guardadas o añade más para facilitar la identificación.</p>
     </div>
 
-    <!-- Muestra de fotos existentes mediante el componente Carrusel -->
-    <% if report.photo.attached? %>
+    <!-- Muestra solo de fotos persistidas en BD -->
+    <% saved_photos = report.photo.select(&:persisted?) %>
+    <% if saved_photos.any? %>
       <div class="space-y-3">
         <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 block">
-          Fotos adjuntas (<%= report.photo.count %>)
+          Fotos adjuntas (<%= saved_photos.count %>)
         </span>
 
-        <% slides = report.photo.map.with_index do |p, idx|
+        <% slides = saved_photos.map do |p|
           {
             content: image_tag(p, class: "w-full h-48 sm:h-56 object-cover rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xs")
           }
@@ -39,7 +40,7 @@
       </div>
     <% end %>
 
-    <!-- Opciones para agregar más fotos -->
+    <!-- Opciones para agregar más fotos con Direct Uploads y Compresión -->
     <div class="border-t border-neutral-100 dark:border-neutral-800 pt-5 space-y-4">
       <label class="block text-sm font-medium text-neutral-900 dark:text-white">
         Agregar más imágenes
@@ -47,7 +48,8 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <!-- Opción 1: Abrir la Cámara -->
-        <div class="p-4 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 bg-neutral-50/50 dark:bg-neutral-800/30 transition-colors text-center">
+        <div class="p-4 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 bg-neutral-50/50 dark:bg-neutral-800/30 transition-colors text-center"
+             data-controller="compressor">
           <div class="flex flex-col items-center justify-center gap-2">
             <div class="p-2.5 rounded-full bg-neutral-200/60 dark:bg-neutral-700/60 text-neutral-700 dark:text-neutral-200">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,18 +59,21 @@
             </div>
             <div>
               <span class="text-sm font-medium text-neutral-900 dark:text-white block">Tomar foto ahora</span>
-              <span class="text-xs text-neutral-500">Abre la cámara del dispositivo</span>
+              <span class="text-xs text-neutral-500" data-compressor-target="info">Abre la cámara del dispositivo</span>
             </div>
             <%= form.file_field :photo,
                 multiple: true,
+                direct_upload: true,
                 accept: "image/*",
                 capture: "environment",
+                data: { compressor_target: "input", action: "change->compressor#compress" },
                 class: "mt-2 w-full text-xs text-neutral-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-neutral-800 dark:file:bg-white dark:file:text-neutral-900 cursor-pointer" %>
           </div>
         </div>
 
         <!-- Opción 2: Elegir de Galería -->
-        <div class="p-4 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 bg-neutral-50/50 dark:bg-neutral-800/30 transition-colors text-center">
+        <div class="p-4 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 bg-neutral-50/50 dark:bg-neutral-800/30 transition-colors text-center"
+             data-controller="compressor">
           <div class="flex flex-col items-center justify-center gap-2">
             <div class="p-2.5 rounded-full bg-neutral-200/60 dark:bg-neutral-700/60 text-neutral-700 dark:text-neutral-200">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,11 +82,13 @@
             </div>
             <div>
               <span class="text-sm font-medium text-neutral-900 dark:text-white block">Seleccionar de galería</span>
-              <span class="text-xs text-neutral-500">Sube imágenes guardadas</span>
+              <span class="text-xs text-neutral-500" data-compressor-target="info">Sube imágenes guardadas</span>
             </div>
             <%= form.file_field :photo,
                 multiple: true,
+                direct_upload: true,
                 accept: "image/jpeg, image/png, image/webp, image/avif, image/heic",
+                data: { compressor_target: "input", action: "change->compressor#compress" },
                 class: "mt-2 w-full text-xs text-neutral-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-neutral-800 dark:file:bg-white dark:file:text-neutral-900 cursor-pointer" %>
           </div>
         </div>
