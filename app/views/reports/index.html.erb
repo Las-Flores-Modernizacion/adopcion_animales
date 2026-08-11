@@ -80,7 +80,7 @@
 
               <div class="mt-auto pt-4 border-t border-neutral-100 dark:border-neutral-800">
                 <% if report.draft? %>
-                  <%= link_to edit_report_path(report_id: report.id), class: "block w-full text-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-semibold text-sm px-4 py-2.5 rounded-xl transition" do %>
+                  <%= link_to edit_report_path(id: report.id), class: "block w-full text-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-semibold text-sm px-4 py-2.5 rounded-xl transition" do %>
                     Continuar edición
                   <% end %>
                 <% end %>
