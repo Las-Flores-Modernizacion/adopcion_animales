@@ -22,10 +22,23 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <% @own_reports.each do |report| %>
           <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm dark:shadow-neutral-950/30 border border-neutral-200 dark:border-neutral-800 overflow-hidden flex flex-col transition hover:shadow-md">
-            <!-- Card Header / Image -->
-            <div class="relative h-48 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0">
+            <!-- Card Header / Image / Carousel -->
+            <div class="relative h-48 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0 overflow-hidden">
               <% if report.photo.attached? %>
-                <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
+                <% if report.photo.count > 1 %>
+                  <% slides = report.photo.map do |p|
+                    { content: image_tag(p, class: "w-full h-48 object-cover") }
+                  end %>
+                  <%= render "shared/components/carousel/carousel",
+                      slides: slides,
+                      slide_size: "full",
+                      dots: true,
+                      buttons: true,
+                      show_gradients: false
+                  %>
+                <% else %>
+                  <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
+                <% end %>
               <% else %>
                 <div class="w-full h-full flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -36,9 +49,9 @@
               <% end %>
 
               <!-- Badge -->
-              <div class="absolute top-3 right-3 flex flex-col gap-1 items-end">
+              <div class="absolute top-3 right-3 flex flex-col gap-1 items-end z-20 pointer-events-none">
                 <% if report.user_id == Current.user.id && report.draft? %>
-                  <span class="bg-yellow-100/90 dark:bg-yellow-950/80 backdrop-blur text-yellow-800 dark:text-yellow-300 text-xs font-bold px-2.5 py-1 rounded-lg border border-yellow-200 dark:border-yellow-800/60 shadow-sm">Borrador</span>
+                  <span class="bg-yellow-100/90 dark:bg-yellow-950/80 backdrop-blur text-yellow-800 dark:text-yellow-300 text-xs font-bold px-2.5 py-1 rounded-lg border border-yellow-200 dark:border-yellow-800/60 shadow-sm pointer-events-auto">Borrador</span>
                 <% end %>
               </div>
             </div>
@@ -99,10 +112,23 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <% @community_reports.each do |report| %>
           <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm dark:shadow-neutral-950/30 border border-neutral-200 dark:border-neutral-800 overflow-hidden flex flex-col transition hover:shadow-md">
-            <!-- Card Header / Image -->
-            <div class="relative h-48 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0">
+            <!-- Card Header / Image / Carousel -->
+            <div class="relative h-48 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0 overflow-hidden">
               <% if report.photo.attached? %>
-                <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
+                <% if report.photo.count > 1 %>
+                  <% slides = report.photo.map do |p|
+                    { content: image_tag(p, class: "w-full h-48 object-cover") }
+                  end %>
+                  <%= render "shared/components/carousel/carousel",
+                      slides: slides,
+                      slide_size: "full",
+                      dots: true,
+                      buttons: true,
+                      show_gradients: false
+                  %>
+                <% else %>
+                  <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
+                <% end %>
               <% else %>
                 <div class="w-full h-full flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
