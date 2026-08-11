@@ -30,19 +30,19 @@
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Identificación del Animal</h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <%= render "shared/components/form_group", label: "Especie", name: "report[animal_attributes][species]" do %>
+        <%= render "shared/components/forms/form_group", label: "Especie", name: "report[animal_attributes][species]" do %>
           <%= animal_form.select :species, Animal.species.keys.map { |s| [s.titleize, s] }, { prompt: "Selecciona una..." }, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
         <% end %>
 
-        <%= render "shared/components/form_group", label: "Tamaño aproximado", name: "report[animal_attributes][size]" do %>
+        <%= render "shared/components/forms/form_group", label: "Tamaño aproximado", name: "report[animal_attributes][size]" do %>
           <%= animal_form.select :size, Animal.sizes.keys.map { |s| [s.titleize, s] }, { prompt: "Selecciona uno..." }, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
         <% end %>
 
-        <%= render "shared/components/form_group", label: "Color principal", name: "report[animal_attributes][color]", helper_text: "Ej. Negro con manchas blancas" do %>
+        <%= render "shared/components/forms/form_group", label: "Color principal", name: "report[animal_attributes][color]", helper_text: "Ej. Negro con manchas blancas" do %>
           <%= animal_form.text_field :color, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
         <% end %>
 
-        <%= render "shared/components/form_group", label: "Raza (si la sabes)", name: "report[animal_attributes][race]" do %>
+        <%= render "shared/components/forms/form_group", label: "Raza (si la sabes)", name: "report[animal_attributes][race]" do %>
           <%= animal_form.text_field :race, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
         <% end %>
       </div>
@@ -99,7 +99,7 @@
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Detalles adicionales</h3>
 
-      <%= render "shared/components/form_group", label: "Rasgos distintivos", name: "report[animal_attributes][unique_detail]", helper_text: "Ej. Le falta media oreja, tiene un collar rojo sin chapa, etc." do %>
+      <%= render "shared/components/forms/form_group", label: "Rasgos distintivos", name: "report[animal_attributes][unique_detail]", helper_text: "Ej. Le falta media oreja, tiene un collar rojo sin chapa, etc." do %>
         <%= animal_form.text_area :unique_detail, rows: 3, class: "w-full rounded-lg border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-neutral-900 dark:focus:ring-white focus:border-neutral-900 dark:focus:border-white" %>
       <% end %>
     </div>
