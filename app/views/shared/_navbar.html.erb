@@ -1,11 +1,12 @@
-<nav class="w-full bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+<nav class="w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-neutral-800 sticky top-0 z-50">
   <div class="container mx-auto px-4 h-16 flex items-center justify-between">
 
     <%# Logo y Navegación Principal %>
     <div class="flex items-center gap-8">
-      <a href="/" class="flex items-center space-x-3 flex-shrink-0 transition-opacity hover:opacity-80 rounded-md focus-visible:outline-2 focus-visible:outline-blue-600">
-        <%= image_tag "logo_gobierno_municipal.png", alt: "Logo Municipio", class: "h-10 w-auto" %>
-        <h1 class="text-lg font-bold text-gray-900 hidden sm:block">Mascotas</h1>
+      <a href="/reportes" class="flex items-center space-x-3 flex-shrink-0 transition-opacity hover:opacity-80 rounded-md focus-visible:outline-2 focus-visible:outline-blue-600">
+        <%= image_tag "logo_gobierno_municipal.png", alt: "Logo Municipio", class: "h-10 w-auto dark:hidden" %>
+        <%= image_tag "logo_gobierno_municipal_light.png", alt: "Logo Municipio", class: "h-10 w-auto hidden dark:block" %>
+        <h1 class="text-lg font-bold text-gray-900 dark:text-neutral-100 hidden sm:block">Mascotas</h1>
       </a>
     </div>
 
@@ -18,7 +19,7 @@
 
           <%# Botón Avatar Pill %>
           <button type="button"
-                  class="flex items-center gap-2.5 p-1 sm:pr-3 rounded-full bg-white shadow-sm ring-1 ring-neutral-900/5 hover:shadow-md hover:ring-neutral-900/10 transition-all duration-300 select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  class="flex items-center gap-2.5 p-1 sm:pr-3 rounded-full bg-white dark:bg-neutral-800 shadow-sm ring-1 ring-neutral-900/5 dark:ring-white/10 hover:shadow-md hover:ring-neutral-900/10 dark:hover:ring-white/20 transition-all duration-300 select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   data-action="click->dropdown#toggle"
                   data-dropdown-target="button"
                   aria-expanded="false"
@@ -31,17 +32,22 @@
               status: "online"
             %>
 
-            <span class="hidden sm:block text-sm font-semibold text-neutral-700 truncate max-w-[150px]">
+            <span class="hidden sm:block text-sm font-semibold text-neutral-700 dark:text-neutral-200 truncate max-w-[150px]">
               <%= Current.user.full_name.titleize %>
             </span>
-            <svg class="hidden sm:block w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="hidden sm:block w-4 h-4 text-neutral-400 dark:text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
 
           <%# Menú Desplegable con Estilado Fancy %>
-          <div class="hidden opacity-0 -translate-y-2 absolute right-0 top-full mt-2.5 w-56 bg-white/95 backdrop-blur-md rounded-2xl p-2 shadow-2xl shadow-neutral-900/10 ring-1 ring-neutral-900/10 border border-neutral-100 z-50 transition-all duration-200 ease-out space-y-1.5"
+          <div class="hidden opacity-0 -translate-y-2 absolute right-0 top-full mt-2.5 w-56 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-2xl p-2 shadow-2xl shadow-neutral-900/10 dark:shadow-neutral-950/50 ring-1 ring-neutral-900/10 dark:ring-white/10 border border-neutral-100 dark:border-neutral-800 z-50 transition-all duration-200 ease-out space-y-1.5"
                data-dropdown-target="menu">
+
+            <%# Selector Modo Oscuro dentro del Menú %>
+            <div class="px-1 py-1.5 border-b border-neutral-100 dark:border-neutral-800 flex justify-center">
+              <%= render "shared/components/dark_mode_switcher/dark_mode_switcher", variant: "segmented", classes: "w-full flex justify-center" %>
+            </div>
 
             <div>
               <%= render "shared/components/buttons/button",
@@ -51,7 +57,7 @@
                 style: "fancy",
                 size: "sm",
                 full_width: true,
-                classes: "!justify-start text-neutral-800 font-medium"
+                classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
               %>
             </div>
 
@@ -72,15 +78,19 @@
           </div>
         </div>
       <% else %>
-        <%= form_with url: "/auth/google", method: :post, data: { turbo: false } do %>
-          <%= render "shared/components/buttons/button",
-            text: "Iniciar sesión",
-            type: "submit",
-            variant: "primary",
-            style: "fancy",
-            classes: "cursor-pointer"
-          %>
-        <% end %>
+        <div class="flex items-center gap-3">
+          <%= render "shared/components/dark_mode_switcher/dark_mode_switcher", variant: "cycle_icon" %>
+
+          <%= form_with url: "/auth/google", method: :post, data: { turbo: false } do %>
+            <%= render "shared/components/buttons/button",
+              text: "Iniciar sesión",
+              type: "submit",
+              variant: "primary",
+              style: "fancy",
+              classes: "cursor-pointer"
+            %>
+          <% end %>
+        </div>
       <% end %>
     </div>
   </div>
