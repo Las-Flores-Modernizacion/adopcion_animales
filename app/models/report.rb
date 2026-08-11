@@ -16,14 +16,16 @@ class Report < ApplicationRecord
   scope :published, -> { where(draft: false).or(where(draft: nil)) }
   scope :community, -> { published.where.not(user_id: Current.user.id) }
 
-  def save_with_location_and_photos(location_params, photos)
-    build_location(
+  def self.build_draft(user, location_params, photos)
+    report = user.reports.build(draft: true)
+
+    report.build_location(
       latitude: location_params[:browser_lat],
       longitude: location_params[:browser_lng]
     )
-    self.photo.attach(photos) if photos.present?
 
-    save
+    report.photo.attach(photos) if photos.present?
+    report
   end
 
   private
@@ -37,7 +39,8 @@ class Report < ApplicationRecord
 
     if photo.attached?
       photo.each do |p|
-        unless extensiones_aceptadas.include?(p.content_type)
+        content_type = p.blob&.content_type || p.content_type
+        unless extensiones_aceptadas.include?(content_type)
           errors.add(:photo, "El formato de una de las imágenes no es válido")
         end
       end
@@ -47,7 +50,8 @@ class Report < ApplicationRecord
   def accepted_file_size
     if photo.attached?
       photo.each do |p|
-        if p.blob.byte_size >= 20.megabytes
+        byte_size = p.blob&.byte_size || p.size
+        if byte_size && byte_size >= 20.megabytes
           errors.add(:photo, "Cada imagen debe pesar menos de 20 MB")
         end
       end

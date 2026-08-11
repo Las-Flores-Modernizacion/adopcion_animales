@@ -18,12 +18,11 @@ class ReportsController < ApplicationController
   end
 
   def create
-    @report = Current.user.reports.build(draft: true)
-
     photos = Array(report_step_one_params[:photo]).reject(&:blank?)
 
-    if @report.save_with_location_and_photos(location_params, photos)
-      redirect_to edit_report_path(@report), notice: "Reporte inicial guardado. Ayúdanos completando los detalles del animal."
+    @report = Report.build_draft(Current.user, location_params, photos)
+    if @report.save
+      redirect_to edit_report_path(@report), notice: "Reporte inicial guardado."
     else
       render :new, status: :unprocessable_entity
     end
