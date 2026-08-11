@@ -1,3 +1,4 @@
+# app/controllers/reports_controller.rb
 class ReportsController < ApplicationController
   def index
     @current_tab = params[:tab] || "own"
@@ -12,7 +13,9 @@ class ReportsController < ApplicationController
   def create
     @report = Current.user.reports.build(draft: true)
 
-    if @report.save_with_location_and_photos(location_params, report_step_one_params[:photo])
+    photos = Array(report_step_one_params[:photo]).reject(&:blank?)
+
+    if @report.save_with_location_and_photos(location_params, photos)
       redirect_to edit_report_path(@report), notice: "Reporte inicial guardado. Ayúdanos completando los detalles del animal."
     else
       render :new, status: :unprocessable_entity
@@ -26,10 +29,14 @@ class ReportsController < ApplicationController
 
   def update
     @report = Current.user.reports.find(params[:id])
-
     @report.draft = false
 
-    if @report.update(report_params)
+    if report_params[:photo].present?
+      new_photos = Array(report_params[:photo]).reject(&:blank?)
+      @report.photo.attach(new_photos) if new_photos.any?
+    end
+
+    if @report.update(report_params.except(:photo))
       redirect_to reports_path, notice: "¡El reporte fue publicado con éxito!"
     else
       @report.draft = true
