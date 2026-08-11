@@ -37,11 +37,13 @@
       <div data-image-preview-target="previewContainer" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
       </div>
 
-      <!-- INPUT MAESTRO -->
       <%= form.file_field :photo,
           multiple: true,
           direct_upload: true,
-          data: { "image-preview-target": "master" },
+          data: {
+            "image-preview-target": "master",
+            action: "change->image-preview#preview"
+          },
           class: "hidden" %>
 
       <!-- UI Compacta de Subida con Componente Button -->
@@ -57,7 +59,7 @@
         </div>
 
         <div class="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
-          <!-- Botón Cámara (Componente Button) -->
+          <!-- Botón Cámara -->
           <div data-controller="compressor">
             <%= render "shared/components/buttons/button",
                 text: "Tomar foto",
@@ -76,7 +78,7 @@
               class="hidden" />
           </div>
 
-          <!-- Botón Galería (Componente Button) -->
+          <!-- Botón Galería -->
           <div data-controller="compressor">
             <%= render "shared/components/buttons/button",
                 text: "Galería",
@@ -86,8 +88,7 @@
                 data: { action: "click->image-preview#openGallery" } %>
 
             <input type="file"
-              accept="image/*"
-              capture="environment"
+              accept="image/jpeg, image/png, image/webp, image/avif, image/heic"
               multiple="multiple"
               data-compressor-target="input"
               data-image-preview-target="galleryInput"

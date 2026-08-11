@@ -13,9 +13,9 @@ export default class extends Controller {
     files.forEach((file) => {
       new Compressor(file, {
         quality: 0.6,
-        maxWidth: 1600, // 1600px es óptimo para celular/pantallas web
+        maxWidth: 1600,
         maxHeight: 1600,
-        convertSize: 1000000, // Convierte PNGs grandes a JPEG automáticamente
+        convertSize: 1000000,
         success: (compressedResult) => {
           const newFile = new File([compressedResult], file.name.replace(/\.[^/.]+$/, ".jpg"), {
             type: compressedResult.type || "image/jpeg",
@@ -32,11 +32,10 @@ export default class extends Controller {
             dataTransfer.items.add(newFile)
             masterInput.files = dataTransfer.files
 
-            // Notificamos a ActiveStorage / ImagePreview que el input maestro cambió
             masterInput.dispatchEvent(new Event("change", { bubbles: true }))
           }
 
-          this.dispatch("success", { target: this.inputTarget })
+          event.target.value = ""
         },
         error(err) {
           console.error("Error al comprimir la imagen:", err.message)
