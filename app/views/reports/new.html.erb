@@ -30,8 +30,12 @@
     <%= hidden_field_tag "location[browser_lng]", nil, data: { gps_target: "lng" } %>
 
     <!-- Selección de Fotos -->
-    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4">
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4" data-controller="image-preview">
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Fotografías del Animal (Requerido)</h3>
+
+      <!-- Contenedor dinámico de previsualización JS -->
+      <div data-image-preview-target="previewContainer" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
+      </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <!-- Cámara Directa -->
@@ -53,7 +57,11 @@
                 direct_upload: true,
                 accept: "image/*",
                 capture: "environment",
-                data: { compressor_target: "input", action: "change->compressor#compress" },
+                data: { 
+                  compressor_target: "input",
+                  image_preview_target: "input",
+                  action: "change->compressor#compress change->image-preview#preview"
+                },
                 class: "mt-2 w-full text-xs text-neutral-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-neutral-800 dark:file:bg-white dark:file:text-neutral-900 cursor-pointer" %>
           </div>
         </div>
@@ -75,7 +83,11 @@
                 multiple: true,
                 direct_upload: true,
                 accept: "image/jpeg, image/png, image/webp, image/avif, image/heic",
-                data: { compressor_target: "input", action: "change->compressor#compress" },
+                data: { 
+                  compressor_target: "input",
+                  image_preview_target: "input",
+                  action: "change->compressor#compress change->image-preview#preview"
+                },
                 class: "mt-2 w-full text-xs text-neutral-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-neutral-800 dark:file:bg-white dark:file:text-neutral-900 cursor-pointer" %>
           </div>
         </div>
