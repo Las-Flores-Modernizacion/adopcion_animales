@@ -2,8 +2,15 @@
 class ReportsController < ApplicationController
   def index
     @current_tab = params[:tab] || "own"
-    @community_reports = Report.community.order(created_at: :desc)
-    @own_reports = Report.own.order(created_at: :desc)
+    @community_reports = Report.community
+                               .includes(:animal, :location)
+                               .with_attached_photo
+                               .order(created_at: :desc)
+
+    @own_reports = Report.own
+                         .includes(:animal, :location)
+                         .with_attached_photo
+                         .order(created_at: :desc)
   end
 
   def new

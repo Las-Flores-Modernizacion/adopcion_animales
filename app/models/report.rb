@@ -17,17 +17,13 @@ class Report < ApplicationRecord
   scope :community, -> { published.where.not(user_id: Current.user.id) }
 
   def save_with_location_and_photos(location_params, photos)
-    ActiveRecord::Base.transaction do
-      location = Location.create!(
-        latitude: location_params[:browser_lat],
-        longitude: location_params[:browser_lng]
-      )
-      self.location = location
-      self.photo.attach(photos) if photos.present?
-      save!
-    end
-  rescue ActiveRecord::RecordInvalid
-    false
+    build_location(
+      latitude: location_params[:browser_lat],
+      longitude: location_params[:browser_lng]
+    )
+    photo.attach(photos) if photos.present?
+
+    save
   end
 
   private
