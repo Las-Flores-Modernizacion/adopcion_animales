@@ -37,12 +37,10 @@ class ReportsController < ApplicationController
     @report = Current.user.reports.find(params[:id])
     @report.draft = false
 
-    if report_params[:photo].present?
-      new_photos = Array(report_params[:photo]).reject(&:blank?)
-      @report.photo.attach(new_photos) if new_photos.any?
-    end
+    new_photos = Array(report_params[:photo]).reject(&:blank?)
 
     if @report.update(report_params.except(:photo))
+      @report.photo.attach(new_photos) if new_photos.any?
       redirect_to reports_path, notice: "¡El reporte fue publicado con éxito!"
     else
       @report.draft = true
