@@ -41,7 +41,7 @@
       <%= form.file_field :photo,
           multiple: true,
           direct_upload: true,
-          data: { image_preview_target: "master" },
+          data: { "image-preview-target": "master" },
           class: "hidden" %>
 
       <!-- UI Compacta de Subida con Componente Button -->
@@ -114,7 +114,7 @@
           variant: "warning",
           style: "fancy",
           size: "sm",
-          data: { gps_target: "retry", action: "click->gps#checkLocation" }
+          data: { "gps-target": "retry", action: "click->gps#checkLocation" }
       %>
     </div>
 
@@ -126,7 +126,7 @@
           style: "fancy",
           variant: "primary",
           disabled: true,
-          data: { gps_target: "submit" },
+          data: { "gps-target": "submit" },
           classes: "pointer-events-none"
       %>
     </div>
