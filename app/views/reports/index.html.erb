@@ -87,6 +87,13 @@
           </div>
         <% end %>
       </div>
+
+      <%= render "shared/components/pagination/pagination",
+        current_page: @own_page,
+        total_pages: @own_reports_total_pages,
+        page_param: :own_page,
+        extra_params: { tab: "own" }
+      %>
     <% else %>
       <div class="flex flex-col items-center justify-center py-20 px-4 text-center bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl border border-neutral-100 dark:border-neutral-800">
         <div class="bg-blue-100 dark:bg-blue-950/60 p-4 rounded-full mb-4">
@@ -168,6 +175,13 @@
           </div>
         <% end %>
       </div>
+
+      <%= render "shared/components/pagination/pagination",
+        current_page: @community_page,
+        total_pages: @community_reports_total_pages,
+        page_param: :community_page,
+        extra_params: { tab: "community" }
+      %>
     <% else %>
       <div class="flex flex-col items-center justify-center py-20 px-4 text-center bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl border border-neutral-100 dark:border-neutral-800">
         <div class="bg-blue-100 dark:bg-blue-950/60 p-4 rounded-full mb-4">
@@ -192,6 +206,7 @@
       own_panel,
       community_panel
     ],
+    default_tab: @current_tab == "community" ? 1 : 0,
     variant: "low_contrast"
   %>
 </div>

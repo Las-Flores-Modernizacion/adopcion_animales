@@ -1,0 +1,41 @@
+<%#
+  Pagination Component
+  Simple previous/next pager with a page indicator. Preserves the rest of
+  the query params already in the URL (e.g. tab, other lists' page cursors).
+
+  Required locals:
+    - current_page: Integer - current 1-indexed page
+    - total_pages: Integer - total number of pages
+    - page_param: Symbol/String - query param name that carries the page number
+
+  Optional locals:
+    - extra_params: Hash (default: {}) - additional query params to force on the links (e.g. tab: "community")
+    - classes: String (default: nil) - additional wrapper classes
+%>
+
+<% extra_params ||= {} %>
+<% classes ||= nil %>
+
+<% if total_pages > 1 %>
+  <% base_params = request.query_parameters.except(page_param.to_s).merge(extra_params) %>
+  <% link_classes = "px-3 py-1.5 rounded-lg text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition" %>
+  <% disabled_classes = "px-3 py-1.5 text-sm font-medium text-neutral-300 dark:text-neutral-700" %>
+
+  <nav class="flex items-center justify-between mt-6 <%= classes %>" aria-label="Paginación">
+    <% if current_page > 1 %>
+      <%= link_to "← Anterior", url_for(base_params.merge(page_param => current_page - 1)), class: link_classes %>
+    <% else %>
+      <span class="<%= disabled_classes %>">← Anterior</span>
+    <% end %>
+
+    <span class="text-sm text-neutral-500 dark:text-neutral-400">
+      Página <%= current_page %> de <%= total_pages %>
+    </span>
+
+    <% if current_page < total_pages %>
+      <%= link_to "Siguiente →", url_for(base_params.merge(page_param => current_page + 1)), class: link_classes %>
+    <% else %>
+      <span class="<%= disabled_classes %>">Siguiente →</span>
+    <% end %>
+  </nav>
+<% end %>

@@ -1,16 +1,21 @@
 # app/controllers/reports_controller.rb
 class ReportsController < ApplicationController
+  REPORTS_PER_PAGE = 12
+
   def index
     @current_tab = params[:tab] || "own"
-    @community_reports = Report.community
-                               .includes(:animal, :location)
-                               .with_attached_photo
-                               .order(created_at: :desc)
 
-    @own_reports = Report.own
-                         .includes(:animal, :location)
-                         .with_attached_photo
-                         .order(created_at: :desc)
+    @own_page = page_param(params[:own_page])
+    @community_page = page_param(params[:community_page])
+
+    own_reports = Report.own.includes(:animal, :location).with_attached_photo.order(created_at: :desc)
+    community_reports = Report.community.includes(:animal, :location).with_attached_photo.order(created_at: :desc)
+
+    @own_reports_total_pages = total_pages(own_reports.count)
+    @community_reports_total_pages = total_pages(community_reports.count)
+
+    @own_reports = own_reports.limit(REPORTS_PER_PAGE).offset((@own_page - 1) * REPORTS_PER_PAGE)
+    @community_reports = community_reports.limit(REPORTS_PER_PAGE).offset((@community_page - 1) * REPORTS_PER_PAGE)
   end
 
   def new
@@ -55,6 +60,15 @@ class ReportsController < ApplicationController
   end
 
   private
+
+  def page_param(value)
+    page = value.to_i
+    page < 1 ? 1 : page
+  end
+
+  def total_pages(count)
+    (count / REPORTS_PER_PAGE.to_f).ceil
+  end
 
   def location_params
     params.require(:location).permit(:browser_lat, :browser_lng)

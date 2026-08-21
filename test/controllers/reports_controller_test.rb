@@ -25,6 +25,26 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, edit_report_path(@reporte_de_maria)
   end
 
+  test "index pagina los reportes propios de a 12" do
+    sign_in_as @tomas
+    14.times { create_report_for(@tomas) } # + @reporte = 15 reportes propios
+
+    get reports_path, params: { own_page: 1 }
+    assert_response :success
+    assert_includes response.body, "Página 1 de 2"
+
+    get reports_path, params: { own_page: 2 }
+    assert_response :success
+    assert_includes response.body, "Página 2 de 2"
+  end
+
+  test "index no muestra el paginador si hay una sola página" do
+    sign_in_as @tomas
+    get reports_path
+    assert_response :success
+    assert_not_includes response.body, "Página 1 de"
+  end
+
   test "new renderiza el formulario de creación" do
     sign_in_as @tomas
     get new_report_path
@@ -127,5 +147,15 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       filename: "colibri.png",
       content_type: "image/png"
     )
+  end
+
+  def create_report_for(user)
+    report = user.reports.new(
+      location: Location.create!(latitude: -34.6, longitude: -58.4),
+      draft: false
+    )
+    attach_photo(report)
+    report.save!
+    report
   end
 end
