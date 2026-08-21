@@ -37,6 +37,7 @@ class ReportTest < ActiveSupport::TestCase
     assert_not reporte.save
     # reporte.errors[:photo]
 
+    reporte.photo.purge
     reporte = @reporte
     reporte.photo.attach(
       io: file_fixture("colibri estatico.png").open,
