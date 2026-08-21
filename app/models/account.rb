@@ -1,5 +1,5 @@
 class Account < ApplicationRecord
-  has_secure_password validations: :false
+  has_secure_password validations: false
 
   belongs_to :user, dependent: :destroy
   has_many :sessions, dependent: :destroy
