@@ -19,7 +19,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.6.1/dist/css/tom-select.css" rel="stylesheet">
 
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       (function() {
         const storedMode = localStorage.getItem("theme");
         const palette = storedMode === "light" || storedMode === "dark"
