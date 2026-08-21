@@ -5,7 +5,4 @@
 # below each fixture, per the syntax in the comments below
 #
 tomas: {}
-# column: value
-#
-# two: {}
-# column: value
+maria: {}

@@ -5,3 +5,9 @@ tomas:
   first_name: "Tomás"
   last_name: "Urra"
   user: tomas #Si pongo user, iria el nombre del usuario, si pongo user_id va el número
+
+maria:
+  email_address: "maria@example.com"
+  first_name: "María"
+  last_name: "Gomez"
+  user: maria

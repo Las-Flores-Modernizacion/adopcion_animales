@@ -7,6 +7,9 @@
 reporte:
   user: tomas
   location: obelisco
-#
-# two: {}
-# column: value
+  draft: false
+
+reporte_de_maria:
+  user: maria
+  location: estatua_libertad
+  draft: false
