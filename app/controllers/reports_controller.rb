@@ -80,10 +80,10 @@ class ReportsController < ApplicationController
 
   def report_params
     params.require(:report).permit(
+      :aggressive, :is_hurt, :is_anxious, :urgent,
       photo: [],
       animal_attributes: [
-        :id, :species, :size, :color, :race, :age, :answer_to_name,
-        :unique_detail, :aggressive, :is_hurt, :is_anxious, :urgent
+        :id, :species, :size, :color, :race, :age, :answer_to_name, :unique_detail
       ]
     )
   end

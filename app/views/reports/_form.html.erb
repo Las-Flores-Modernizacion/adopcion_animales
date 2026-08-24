@@ -155,51 +155,6 @@
       </div>
     </div>
 
-    <!-- Tarjeta: Estado y Comportamiento -->
-    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
-      <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Estado y Comportamiento</h3>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <%= animal_form.hidden_field :urgent, value: "0" %>
-        <%= render "shared/components/checkbox/checkbox",
-            label: "Caso Urgente",
-            description: "Requiere asistencia inmediata",
-            name: "report[animal_attributes][urgent]",
-            value: "1",
-            checked: animal_form.object.urgent,
-            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
-
-        <%= animal_form.hidden_field :is_hurt, value: "0" %>
-        <%= render "shared/components/checkbox/checkbox",
-            label: "Está herido",
-            description: "Presenta lesiones visibles",
-            name: "report[animal_attributes][is_hurt]",
-            value: "1",
-            checked: animal_form.object.is_hurt,
-            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
-
-        <%= animal_form.hidden_field :aggressive, value: "0" %>
-        <%= render "shared/components/checkbox/checkbox",
-            label: "Comportamiento agresivo",
-            description: "Precaución al acercarse",
-            name: "report[animal_attributes][aggressive]",
-            value: "1",
-            checked: animal_form.object.aggressive,
-            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
-
-        <%= animal_form.hidden_field :is_anxious, value: "0" %>
-        <%= render "shared/components/checkbox/checkbox",
-            label: "Asustado o ansioso",
-            description: "Tiembla o se esconde",
-            name: "report[animal_attributes][is_anxious]",
-            value: "1",
-            checked: animal_form.object.is_anxious,
-            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
-      </div>
-    </div>
-
     <!-- Tarjeta: Detalles extra -->
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
       <div class="flex items-center justify-between mb-4">
@@ -216,6 +171,51 @@
       <% end %>
     </div>
   <% end %>
+
+  <!-- Tarjeta: Estado y Comportamiento -->
+  <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Estado y Comportamiento</h3>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <%= form.hidden_field :urgent, value: "0" %>
+      <%= render "shared/components/checkbox/checkbox",
+          label: "Caso Urgente",
+          description: "Requiere asistencia inmediata",
+          name: "report[urgent]",
+          value: "1",
+          checked: form.object.urgent,
+          classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+      <%= form.hidden_field :is_hurt, value: "0" %>
+      <%= render "shared/components/checkbox/checkbox",
+          label: "Está herido",
+          description: "Presenta lesiones visibles",
+          name: "report[is_hurt]",
+          value: "1",
+          checked: form.object.is_hurt,
+          classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+      <%= form.hidden_field :aggressive, value: "0" %>
+      <%= render "shared/components/checkbox/checkbox",
+          label: "Comportamiento agresivo",
+          description: "Precaución al acercarse",
+          name: "report[aggressive]",
+          value: "1",
+          checked: form.object.aggressive,
+          classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+      <%= form.hidden_field :is_anxious, value: "0" %>
+      <%= render "shared/components/checkbox/checkbox",
+          label: "Asustado o ansioso",
+          description: "Tiembla o se esconde",
+          name: "report[is_anxious]",
+          value: "1",
+          checked: form.object.is_anxious,
+          classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+    </div>
+  </div>
 
   <!-- Botones de acción -->
   <div class="flex flex-col sm:flex-row justify-end gap-3 pt-2">

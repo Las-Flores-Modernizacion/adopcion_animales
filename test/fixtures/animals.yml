@@ -1,30 +1,19 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 tito:
-  report: reporte
   color: blanco
   size: :pequeño
-  aggressive: false
   unique_detail: rengo
-  is_hurt: false
-  urgent: false
   answer_to_name: tito
   species: :perro
   race: caniche
-  is_anxious: false
   age: 5
 
-
 tasha:
-  report: reporte_de_maria
   color: gris
   size: :pequeño
-  aggressive: false
   unique_detail: ciego de un ojo
-  is_hurt: false
-  urgent: false
   answer_to_name: tasha
   species: :perro
   race: caniche
-  is_anxious: false
   age: 11

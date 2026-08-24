@@ -1,9 +1,11 @@
 class Report < ApplicationRecord
   belongs_to :user
   belongs_to :location
-  has_one :animal, dependent: :destroy
+  belongs_to :animal, optional: true
 
   has_many_attached :photo
+
+  enum :status, { perdido: 0, avistado: 1, en_transito: 2, en_proceso_adopcion: 3, adoptado: 4, encontrado: 5 }
 
   accepts_nested_attributes_for :animal, update_only: true
 

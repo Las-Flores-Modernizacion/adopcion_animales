@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_10_143622) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_24_120145) do
   create_table "accounts", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest"
@@ -59,19 +59,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_143622) do
   create_table "animals", force: :cascade do |t|
     t.string "color"
     t.integer "size"
-    t.boolean "aggressive"
     t.string "unique_detail"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "is_hurt"
-    t.boolean "urgent"
     t.string "answer_to_name"
     t.integer "species"
-    t.boolean "is_anxious"
     t.integer "age"
     t.string "race"
-    t.integer "report_id", null: false
-    t.index ["report_id"], name: "index_animals_on_report_id"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -88,6 +82,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_143622) do
     t.integer "user_id", null: false
     t.integer "location_id", null: false
     t.boolean "draft", default: true
+    t.integer "animal_id"
+    t.boolean "aggressive"
+    t.boolean "is_hurt"
+    t.boolean "is_anxious"
+    t.boolean "urgent"
+    t.integer "status", default: 0, null: false
+    t.index ["animal_id"], name: "index_reports_on_animal_id"
     t.index ["location_id"], name: "index_reports_on_location_id"
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
@@ -109,7 +110,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_143622) do
   add_foreign_key "accounts", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "animals", "reports"
+  add_foreign_key "reports", "animals"
   add_foreign_key "reports", "locations"
   add_foreign_key "reports", "users"
   add_foreign_key "sessions", "accounts"

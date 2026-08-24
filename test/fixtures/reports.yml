@@ -1,15 +1,21 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
 reporte:
   user: tomas
   location: obelisco
+  animal: tito
   draft: false
+  aggressive: false
+  is_hurt: false
+  is_anxious: false
+  urgent: false
 
 reporte_de_maria:
   user: maria
   location: estatua_libertad
+  animal: tasha
   draft: false
+  aggressive: false
+  is_hurt: false
+  is_anxious: false
+  urgent: false
