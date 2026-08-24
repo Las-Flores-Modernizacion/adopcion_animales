@@ -1,7 +1,7 @@
-# Solo montado en development (ver config/routes.rb). Permite listar las
-# cuentas existentes y entrar a cualquiera con un click, o crear una cuenta
-# de prueba al vuelo, sin pasar por el flujo real de Google OAuth. Útil para
-# probar la app en local, donde no hay credenciales reales configuradas.
+# Solo montado en development (ver config/routes.rb). Permite loguearse como
+# cualquier email visitando /dev_login/:email, sin pasar por Google OAuth, ya
+# que no hay credenciales reales configuradas en local. Si la cuenta no
+# existe, se crea al vuelo.
 #
 # Nunca disponible en producción ni en test: además de que la ruta solo se
 # define cuando Rails.env.development?, el before_action de acá abajo corta
@@ -11,26 +11,18 @@ class DevLoginController < ApplicationController
 
   before_action :ensure_development_environment!
 
-  def index
-    @accounts = Account.includes(:user).order(:first_name, :last_name)
-  end
+  def show
+    account = Account.find_or_initialize_by(email_address: params[:email])
 
-  def create
-    account = Account.find(params[:id])
-    start_new_session_for(account)
-    redirect_to after_authentication_url, notice: "Sesión iniciada como #{account.full_name.titleize}."
-  end
-
-  def create_test_account
-    account = Account.create!(
-      email_address: "dev+#{SecureRandom.hex(4)}@example.com",
-      first_name: "Dev",
-      last_name: "Tester",
-      password: SecureRandom.hex(12)
-    )
+    if account.new_record?
+      account.first_name ||= "dev"
+      account.last_name ||= "tester"
+      account.password = SecureRandom.hex(12)
+      account.save!
+    end
 
     start_new_session_for(account)
-    redirect_to after_authentication_url, notice: "Cuenta de prueba creada e iniciada sesión."
+    redirect_to after_authentication_url
   end
 
   private

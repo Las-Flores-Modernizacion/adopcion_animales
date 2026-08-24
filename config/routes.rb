@@ -11,14 +11,13 @@ Rails.application.routes.draw do
   end
   delete "/logout", to: "sessions#destroy"
 
-  # Atajo de login solo para development: permite entrar como cualquier
-  # cuenta existente (o crear una de prueba) sin pasar por Google OAuth,
-  # ya que no hay credenciales reales configuradas en local. Nunca se monta
-  # fuera de development (ver DevLoginController para el resguardo extra).
+  # Atajo de login solo para development: entrar como cualquier email
+  # visitando /dev_login/:email (se crea la cuenta si no existe), sin pasar
+  # por Google OAuth ya que no hay credenciales reales configuradas en local.
+  # Nunca se monta fuera de development (ver DevLoginController para el
+  # resguardo extra).
   if Rails.env.development?
-    get "/dev_login", to: "dev_login#index", as: :dev_login
-    post "/dev_login/nueva_cuenta", to: "dev_login#create_test_account", as: :dev_login_new_account
-    post "/dev_login/:id", to: "dev_login#create", as: :dev_login_account
+    get "/dev_login/:email", to: "dev_login#show", constraints: { email: /[^\/]+/ }, as: :dev_login
   end
 
   resources :reports, path: "reportes" do
