@@ -62,12 +62,11 @@
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Estado y Comportamiento</h3>
 
-      <%= render "shared/components/select/select",
-          label: "¿Cómo está ahora?",
-          name: "sighting[status]",
-          options: (Report::STATUSES.keys.map(&:to_s) - [ "adoptado" ]).map { |s| [status_label(s), s] },
-          selected: @status,
-          required: true %>
+      <div>
+        <span class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Vas a marcar este reporte como</span>
+        <%= render "shared/components/badge/badge", text: status_label(@status), variant: status_badge_variant(@status), pill: true %>
+        <%= hidden_field_tag "sighting[status]", @status %>
+      </div>
 
       <%= render "shared/components/forms/form_group",
           label: "Teléfono de contacto (opcional)",

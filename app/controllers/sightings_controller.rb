@@ -1,4 +1,12 @@
 class SightingsController < ApplicationController
+  # Los únicos estados que se pueden cargar desde este formulario común (uno
+  # por cada opción del menú "Ayudar"). "perdido" es el estado inicial, no
+  # una acción; "encontrado" lo marca solo el dueño (ver ReportsController
+  # #found) y "adoptado" solo el área de Cuidado Animal al aprobar una
+  # solicitud (ver ReportsController#approve_adoption) — ninguno de los dos
+  # es asignable acá, aunque cualquier usuario esté logueado.
+  ASSIGNABLE_STATUSES = %w[avistado en_transito en_proceso_adopcion].freeze
+
   def new
     @report = Report.published.find(params[:report_id])
     @status = valid_status(params[:status]) || "avistado"
@@ -36,11 +44,8 @@ class SightingsController < ApplicationController
 
   private
 
-  # "adoptado" no es un estado que se pueda cargar desde un avistamiento común:
-  # solo lo asigna el área de Cuidado Animal al aprobar una solicitud
-  # (ver ReportsController#approve_adoption).
   def valid_status(status)
-    status.presence_in(Report::STATUSES.keys.map(&:to_s) - [ "adoptado" ])
+    status.presence_in(ASSIGNABLE_STATUSES)
   end
 
   def location_params

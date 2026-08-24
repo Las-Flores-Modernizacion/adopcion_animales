@@ -45,18 +45,28 @@ class SightingsControllerTest < ActionDispatch::IntegrationTest
     assert_in_delta(-34.7, @reporte.location.latitude.to_f, 0.01)
   end
 
-  test "new preselecciona el estado pedido por query param" do
+  test "new fija el estado pedido por query param en un campo oculto, no editable" do
     sign_in_as @maria
     get new_report_sighting_path(@reporte, status: "en_transito")
     assert_response :success
-    assert_select "select[name='sighting[status]'] option[selected][value=en_transito]"
+    assert_select "input[type=hidden][name='sighting[status]'][value=en_transito]"
+    assert_select "select[name='sighting[status]']", count: 0
   end
 
   test "new ignora un estado inválido y usa avistado por defecto" do
     sign_in_as @maria
     get new_report_sighting_path(@reporte, status: "no_es_un_estado")
     assert_response :success
-    assert_select "select[name='sighting[status]'] option[selected][value=avistado]"
+    assert_select "input[type=hidden][name='sighting[status]'][value=avistado]"
+  end
+
+  test "new no permite fijar los estados reservados a otros flujos (perdido, encontrado, adoptado)" do
+    sign_in_as @maria
+
+    %w[perdido encontrado adoptado].each do |status|
+      get new_report_sighting_path(@reporte, status: status)
+      assert_select "input[type=hidden][name='sighting[status]'][value=avistado]"
+    end
   end
 
   test "create guarda el teléfono de contacto en el perfil del usuario" do
@@ -70,15 +80,16 @@ class SightingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "2244 111111", @maria.account.reload.phone_number
   end
 
-  test "create no permite asignar el estado adoptado desde un avistamiento común" do
+  test "create no permite asignar estados reservados (perdido, encontrado, adoptado) desde acá" do
     sign_in_as @maria
 
-    post report_sightings_path(@reporte), params: {
-      location: { browser_lat: "-34.7", browser_lng: "-58.5" },
-      sighting: { status: "adoptado" }
-    }
-
-    assert_equal "avistado", @reporte.reload.status
+    %w[perdido encontrado adoptado].each do |status|
+      post report_sightings_path(@reporte), params: {
+        location: { browser_lat: "-34.7", browser_lng: "-58.5" },
+        sighting: { status: status }
+      }
+      assert_equal "avistado", @reporte.reload.status
+    end
   end
 
   test "create no permite avistar un reporte en borrador" do
