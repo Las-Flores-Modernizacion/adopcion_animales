@@ -11,7 +11,7 @@ class AnimalTest < ActiveSupport::TestCase
     animal.color = "123456"
     assert_not animal.save
 
-    
+
     animal.color = "a354"
     assert_not animal.save
 
