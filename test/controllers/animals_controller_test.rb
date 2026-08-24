@@ -21,6 +21,21 @@ class AnimalsControllerTest < ActionDispatch::IntegrationTest
     assert_includes ids, animals(:tasha).id
   end
 
+  test "index incluye la miniatura del reporte más reciente con foto" do
+    sign_in_as @tomas
+    reports(:reporte).photo.attach(
+      io: file_fixture("colibri estatico.png").open,
+      filename: "colibri.png",
+      content_type: "image/png"
+    )
+
+    get animals_path, params: { query: "caniche" }, as: :json
+    body = JSON.parse(response.body)
+    tito_json = body["data"].find { |a| a["id"] == animals(:tito).id }
+
+    assert tito_json["image"].present?
+  end
+
   test "index filtra por especie y por texto de búsqueda" do
     sign_in_as @tomas
 
