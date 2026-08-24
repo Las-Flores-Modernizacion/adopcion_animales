@@ -1,0 +1,27 @@
+<%#
+  Admin Subnav
+  Navegación simple entre las secciones del panel de administración.
+
+  Optional locals:
+    - current: String (default: nil) - "metricas" | "usuarios" | "reportes" | "mapa"
+%>
+
+<% current = local_assigns.fetch(:current, nil) %>
+
+<%
+  links = [
+    { key: "metricas", text: "Métricas", href: admin_root_path },
+    { key: "usuarios", text: "Usuarios", href: admin_users_path },
+    { key: "reportes", text: "Reportes", href: admin_reports_path },
+    { key: "mapa", text: "Mapa", href: map_admin_reports_path }
+  ]
+%>
+
+<nav class="flex flex-wrap gap-2 mb-6">
+  <% links.each do |link| %>
+    <%= render "shared/components/buttons/button",
+        text: link[:text], href: link[:href],
+        variant: current == link[:key] ? "primary" : "secondary",
+        style: "fancy", size: "sm" %>
+  <% end %>
+</nav>

@@ -11,3 +11,10 @@ maria:
   first_name: "María"
   last_name: "Gomez"
   user: maria
+
+admin:
+  email_address: "admin@example.com"
+  first_name: "Ana"
+  last_name: "Admin"
+  user: admin
+  role: admin

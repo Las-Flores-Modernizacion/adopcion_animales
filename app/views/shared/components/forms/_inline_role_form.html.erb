@@ -1,0 +1,18 @@
+<%#
+  Inline Role Form
+  Small form used inside a table cell to change an account's role, submitting
+  automatically on change (see select component's submit_on_change).
+
+  Required locals:
+    - account: Account
+%>
+
+<%= form_with model: account, url: admin_user_path(account), method: :patch do %>
+  <%= render "shared/components/select/select",
+      name: "account[role]",
+      options: Account.roles.keys.map { |role| [ role.titleize, role ] },
+      selected: account.role,
+      clearable: false,
+      submit_on_change: true,
+      size: "sm" %>
+<% end %>

@@ -1,0 +1,48 @@
+<%#
+  Horizontal Bars
+  Simple horizontal bar list for comparing counts side by side (e.g. status
+  or species breakdowns in the admin metrics panel). Bars are scaled relative
+  to the largest value in the set.
+
+  Required locals:
+    - items: Array<Hash> - [{ label:, value: }, ...]
+      Optional per-item keys:
+        - color: String - Tailwind background classes for the bar (overrides the default local)
+        - hex: String - Inline hex color for the bar (takes priority over color/default)
+
+  Optional locals:
+    - color: String (default: "bg-neutral-800 dark:bg-white") - default bar fill classes
+    - value_formatter: Proc (default: nil) - formats the displayed value, receives the raw value
+    - empty_message: String (default: "Sin datos todavía.")
+%>
+
+<% items ||= [] %>
+<% color ||= "bg-neutral-800 dark:bg-white" %>
+<% value_formatter ||= nil %>
+<% empty_message ||= "Sin datos todavía." %>
+
+<% if items.empty? %>
+  <p class="text-sm text-neutral-400"><%= empty_message %></p>
+<% else %>
+  <% max_value = items.map { |item| item[:value].to_f }.max %>
+
+  <div class="space-y-2.5">
+    <% items.each do |item| %>
+      <% percentage = max_value.positive? ? (item[:value].to_f / max_value * 100).round(1) : 0 %>
+      <% bar_classes = item[:hex] ? nil : (item[:color] || color) %>
+      <% bar_style = item[:hex] ? "width: #{percentage}%; background-color: #{item[:hex]};" : "width: #{percentage}%;" %>
+
+      <div>
+        <div class="flex items-center justify-between text-sm mb-1">
+          <span class="text-neutral-700 dark:text-neutral-300 capitalize"><%= item[:label] %></span>
+          <span class="font-semibold text-neutral-800 dark:text-neutral-100">
+            <%= value_formatter ? value_formatter.call(item[:value]) : item[:value] %>
+          </span>
+        </div>
+        <div class="h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+          <div class="h-full rounded-full transition-all <%= bar_classes %>" style="<%= bar_style %>"></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

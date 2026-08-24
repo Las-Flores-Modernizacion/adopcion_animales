@@ -75,6 +75,20 @@
               </div>
             <% end %>
 
+            <% if Current.account&.admin? %>
+              <div>
+                <%= render "shared/components/buttons/button",
+                  text: "Panel de administración",
+                  href: admin_root_path,
+                  variant: "secondary",
+                  style: "fancy",
+                  size: "sm",
+                  full_width: true,
+                  classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
+                %>
+              </div>
+            <% end %>
+
             <div>
               <%= render "shared/components/buttons/button",
                 text: "Mi perfil",
