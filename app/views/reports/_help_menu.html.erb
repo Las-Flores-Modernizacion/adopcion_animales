@@ -11,16 +11,16 @@
     - button_size: String (default: "sm") - Tamaño del botón trigger, ver componente button
     - full_width: Boolean (default: true) - Si el botón trigger ocupa todo el ancho disponible.
       Usar false para un botón compacto (p.ej. junto a un badge de estado).
-    - direction: String (default: "down") - Hacia dónde abre el menú: "down" o "up". Usar "up"
-      cuando el trigger está al final de un contenedor con overflow-hidden (como una card), para
-      que el menú no quede recortado al abrirse fuera de los límites del contenedor.
+    - direction: String (default: "down") - Hacia dónde abre el menú respecto del botón: "down" o
+      "up". El menú se posiciona con position:fixed vía JS (ver dropdown_controller#positionMenu)
+      en vez de con clases de Tailwind, precisamente para no depender de dónde caiga dentro del
+      flujo normal — así ignora cualquier overflow-hidden de sus contenedores (como una card).
 %>
 
 <% classes = local_assigns.fetch(:classes, nil) %>
 <% button_size = local_assigns.fetch(:button_size, "sm") %>
 <% full_width = local_assigns.fetch(:full_width, true) %>
 <% direction = local_assigns.fetch(:direction, "down") %>
-<% menu_position_classes = direction == "up" ? "bottom-full mb-2" : "top-full mt-2" %>
 
 <div class="relative <%= classes %>" data-controller="dropdown" data-action="click@window->dropdown#hideOnClickOutside">
   <%= render "shared/components/buttons/button",
@@ -33,8 +33,10 @@
       data: { "dropdown-target": "button", action: "click->dropdown#toggle" }
   %>
 
-  <div class="hidden opacity-0 -translate-y-2 absolute left-0 right-0 sm:right-auto <%= menu_position_classes %> w-full sm:w-64 bg-white dark:bg-neutral-900 rounded-2xl p-2 shadow-2xl shadow-neutral-900/10 dark:shadow-neutral-950/50 ring-1 ring-neutral-900/10 dark:ring-white/10 border border-neutral-100 dark:border-neutral-800 z-30 transition-all duration-200 ease-out space-y-1"
-       data-dropdown-target="menu">
+  <div class="hidden opacity-0 -translate-y-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-neutral-900 rounded-2xl p-2 shadow-2xl shadow-neutral-900/10 dark:shadow-neutral-950/50 ring-1 ring-neutral-900/10 dark:ring-white/10 border border-neutral-100 dark:border-neutral-800 z-50 transition-all duration-200 ease-out space-y-1"
+       data-dropdown-target="menu"
+       data-dropdown-fixed-position="true"
+       data-dropdown-direction="<%= direction %>">
     <%= render "shared/components/buttons/button",
         text: "Avisté a este animal", href: new_report_sighting_path(report, status: "avistado"),
         variant: "secondary", style: "fancy", size: "sm", full_width: true, classes: "!justify-start" %>
