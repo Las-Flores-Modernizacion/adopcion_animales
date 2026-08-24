@@ -1,7 +1,9 @@
 <% content_for :title, "Detalle del Reporte" %>
 
 <% animal = @report.animal %>
-<% latest_sighting = @report.sightings.order(created_at: :desc).first %>
+<% sightings = @report.sightings.order(created_at: :desc).to_a %>
+<% latest_sighting = sightings.first %>
+<% zone = @report.probable_zone %>
 
 <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6">
   <div class="mb-6">
@@ -109,7 +111,6 @@
       <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
         <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-4">Cronología de avistamientos</h2>
 
-        <% sightings = @report.sightings.order(created_at: :desc).to_a %>
         <ul class="space-y-0">
           <% sightings.each_with_index do |sighting, index| %>
             <li class="relative flex gap-3 pb-6 last:pb-0">
@@ -139,4 +140,29 @@
       </div>
     </div>
   </div>
+
+  <% if sightings.any? %>
+    <% markers = sightings.reverse.map { |s| { lat: s.location.latitude.to_f, lng: s.location.longitude.to_f, label: status_label(s.status), date: s.created_at.strftime("%d/%m/%Y %H:%M") } } %>
+
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 mt-6">
+      <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-1">Mapa de avistamientos</h2>
+      <p class="text-xs text-neutral-500 mb-4">
+        <% if zone %>
+          Círculo azul: zona probable actual, radio estimado de ~<%= number_with_precision(zone[:radius_km], precision: 1) %> km según los avistamientos y la movilidad esperada del animal. Es una estimación, no una garantía.
+        <% else %>
+          Ubicaciones de los avistamientos registrados.
+        <% end %>
+      </p>
+
+      <div
+        class="w-full h-80 sm:h-96 rounded-xl overflow-hidden z-0"
+        data-controller="map"
+        data-map-markers-value="<%= markers.to_json %>"
+        <% if zone %>
+          data-map-center-value="<%= { lat: zone[:center][:latitude], lng: zone[:center][:longitude] }.to_json %>"
+          data-map-radius-km-value="<%= zone[:radius_km] %>"
+        <% end %>
+      ></div>
+    </div>
+  <% end %>
 </div>

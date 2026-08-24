@@ -13,11 +13,13 @@ Rails.application.configure do
     policy.form_action  :self
 
     # Avatars come from the account's Google profile photo (accounts.avatar_url).
-    policy.img_src      :self, :data, "https://*.googleusercontent.com"
+    # Map tiles for the sighting map (mapa de triangulación) come from OpenStreetMap.
+    policy.img_src      :self, :data, "https://*.googleusercontent.com", "https://*.tile.openstreetmap.org"
     policy.font_src     :self
 
-    # embla-carousel, floating-ui and tom-select are pinned from jsdelivr in config/importmap.rb;
-    # tom-select's stylesheet is also loaded from jsdelivr in the layout.
+    # embla-carousel, floating-ui, tom-select and leaflet are pinned from jsdelivr in
+    # config/importmap.rb; tom-select's and leaflet's stylesheets are also loaded from jsdelivr
+    # in the layout.
     policy.script_src   :self, "https://cdn.jsdelivr.net"
     # Inline style="" attributes (progress bars, avatar stacking offsets) can't carry a nonce,
     # so style-src needs unsafe-inline in addition to the CDN stylesheet.

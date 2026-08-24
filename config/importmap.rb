@@ -11,3 +11,4 @@ pin "embla-carousel", to: "https://cdn.jsdelivr.net/npm/embla-carousel/embla-car
 pin "embla-carousel-wheel-gestures", to: "https://cdn.jsdelivr.net/npm/embla-carousel-wheel-gestures@latest/+esm"
 pin "@floating-ui/dom", to: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm"
 pin "tom-select", to: "https://cdn.jsdelivr.net/npm/tom-select@2.6.1/+esm"
+pin "leaflet", to: "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/+esm"

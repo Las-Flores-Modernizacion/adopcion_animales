@@ -56,6 +56,12 @@ class Report < ApplicationRecord
     sighting
   end
 
+  # Zona probable actual estimada a partir de la cronología de avistamientos.
+  # Devuelve nil si todavía no hay avistamientos. Ver MobilityEstimator.
+  def probable_zone
+    MobilityEstimator.new(self).probable_zone
+  end
+
   private
 
   def photo_presence
