@@ -17,47 +17,51 @@
 <% slidable = local_assigns.fetch(:slidable, false) %>
 <% animal = report.animal %>
 
-<div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm dark:shadow-neutral-950/30 border border-neutral-200 dark:border-neutral-800 overflow-hidden flex flex-col transition hover:shadow-md">
-  <!-- Card Header / Image -->
-  <div class="relative h-48 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0 overflow-hidden">
-    <% if report.photo.attached? %>
-      <% if slidable && report.photo.count > 1 %>
-        <% slides = report.photo.map { |p| { content: image_tag(p, class: "w-full h-48 object-cover") } } %>
-        <%= render "shared/components/carousel/carousel",
-            slides: slides,
-            slide_size: "full",
-            dots: true,
-            buttons: true,
-            show_gradients: false,
-            edge_to_edge: true,
-            overlay: true
-        %>
-      <% else %>
-        <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
-
-        <% if report.photo.count > 1 %>
-          <div class="absolute bottom-3 left-3 z-20">
-            <%= render "shared/components/badge/badge", text: "+#{report.photo.count - 1} fotos", variant: "neutral", classes: "!bg-black/60 dark:!bg-black/60 !text-white backdrop-blur" %>
-          </div>
-        <% end %>
-      <% end %>
+<% media = capture do %>
+  <% if report.photo.attached? %>
+    <% if slidable && report.photo.count > 1 %>
+      <% slides = report.photo.map { |p| { content: image_tag(p, class: "w-full h-48 object-cover") } } %>
+      <%= render "shared/components/carousel/carousel",
+          slides: slides,
+          slide_size: "full",
+          dots: true,
+          buttons: true,
+          show_gradients: false,
+          edge_to_edge: true,
+          overlay: true
+      %>
     <% else %>
-      <div class="w-full h-full flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        <span class="text-xs font-medium">Sin foto</span>
-      </div>
-    <% end %>
+      <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
 
-    <% if own && report.user_id == Current.user.id && report.draft? %>
-      <div class="absolute top-3 right-3 z-20">
-        <%= render "shared/components/badge/badge", text: "Borrador", variant: "yellow" %>
-      </div>
+      <% if report.photo.count > 1 %>
+        <div class="absolute bottom-3 left-3 z-20">
+          <%= render "shared/components/badge/badge", text: "+#{report.photo.count - 1} fotos", variant: "neutral", classes: "!bg-black/60 dark:!bg-black/60 !text-white backdrop-blur" %>
+        </div>
+      <% end %>
     <% end %>
-  </div>
+  <% else %>
+    <div class="w-full h-full flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <span class="text-xs font-medium">Sin foto</span>
+    </div>
+  <% end %>
 
-  <!-- Card Body -->
+  <% if own && report.user_id == Current.user.id && report.draft? %>
+    <div class="absolute top-3 right-3 z-20">
+      <%= render "shared/components/badge/badge", text: "Borrador", variant: "yellow" %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render "shared/components/card/card",
+    padding: "none",
+    shadow: "sm",
+    hoverable: true,
+    media_content: media,
+    image_classes: "h-48 flex-shrink-0",
+    classes: "flex flex-col" do %>
   <div class="p-4 flex flex-col flex-grow">
     <h3 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 mb-1 capitalize truncate">
       <%= animal&.species.presence || "Especie desconocida" %>
@@ -96,4 +100,4 @@
       <% end %>
     </div>
   </div>
-</div>
+<% end %>

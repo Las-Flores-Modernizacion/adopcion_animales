@@ -28,6 +28,9 @@
     - image_position: String (default: "top") - "top" or "bottom"
     - image_aspect: String (default: nil) - "square", "video", "wide", or nil for auto
     - image_classes: String - Additional image wrapper classes
+    - media_content: String/HTML - Arbitrary content for the media slot instead of a plain image
+      (e.g. a rendered carousel partial). Takes priority over image_src when both are given; shares
+      image_position/image_aspect/image_classes for sizing, since it fills the same slot.
 %>
 
 <% variant ||= "default" %>
@@ -50,6 +53,7 @@
 <% image_position ||= "top" %>
 <% image_aspect ||= nil %>
 <% image_classes ||= nil %>
+<% media_content ||= nil %>
 
 <%
   # Build variant classes
@@ -160,19 +164,23 @@
     else ""
     end
 
-  image_wrapper_classes = [image_aspect_classes, "bg-neutral-200 dark:bg-neutral-700", image_classes].compact.reject(&:empty?).join(" ")
+  image_wrapper_classes = ["relative overflow-hidden", image_aspect_classes, "bg-neutral-200 dark:bg-neutral-700", image_classes].compact.reject(&:empty?).join(" ")
 
   # Determine if we have content
   has_header = header_content.present?
   has_footer = footer_content.present?
-  has_image = image_src.present?
+  has_media = image_src.present? || media_content.present?
   has_body = body_content.present? || block_given?
 %>
 
 <div class="<%= wrapper_classes %>">
-  <% if has_image && image_position.to_s == "top" %>
+  <% if has_media && image_position.to_s == "top" %>
     <div class="<%= image_wrapper_classes %>">
-      <%= image_tag(image_src, alt: image_alt, class: "w-full h-full object-center object-cover") %>
+      <% if media_content.present? %>
+        <%= media_content.html_safe %>
+      <% else %>
+        <%= image_tag(image_src, alt: image_alt, class: "w-full h-full object-center object-cover") %>
+      <% end %>
     </div>
   <% end %>
 
@@ -198,9 +206,13 @@
     </div>
   <% end %>
 
-  <% if has_image && image_position.to_s == "bottom" %>
+  <% if has_media && image_position.to_s == "bottom" %>
     <div class="<%= image_wrapper_classes %>">
-      <%= image_tag(image_src, alt: image_alt, class: "w-full h-full object-center object-cover") %>
+      <% if media_content.present? %>
+        <%= media_content.html_safe %>
+      <% else %>
+        <%= image_tag(image_src, alt: image_alt, class: "w-full h-full object-center object-cover") %>
+      <% end %>
     </div>
   <% end %>
 </div>
