@@ -10,7 +10,11 @@ class ReportsController < ApplicationController
       .includes(:animal, :location, adoption_requests: { user: :account }).with_attached_photo.order(created_at: :desc)
   end
 
+  # El admin tiene su propio listado (con todos los reportes, no solo los
+  # propios/de la comunidad) en app/controllers/admin/reports_controller.rb.
   def index
+    redirect_to admin_reports_path and return if Current.account&.admin?
+
     @current_tab = params[:tab] || "own"
 
     @own_page = page_param(params[:own_page])

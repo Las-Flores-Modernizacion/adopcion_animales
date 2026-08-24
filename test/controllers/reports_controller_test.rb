@@ -25,6 +25,12 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, edit_report_path(@reporte_de_maria)
   end
 
+  test "index redirige a un admin al panel de administración" do
+    sign_in_as users(:admin)
+    get reports_path
+    assert_redirected_to admin_reports_path
+  end
+
   test "index pagina los reportes propios de a 12" do
     sign_in_as @tomas
     14.times { create_report_for(@tomas) } # + @reporte = 15 reportes propios

@@ -3,7 +3,7 @@
 
     <%# Logo y Navegación Principal %>
     <div class="flex items-center gap-8">
-      <a href="/reportes" class="flex items-center space-x-3 flex-shrink-0 transition-opacity hover:opacity-80 rounded-md focus-visible:outline-2 focus-visible:outline-blue-600">
+      <a href="<%= Current.account&.admin? ? admin_root_path : "/reportes" %>" class="flex items-center space-x-3 flex-shrink-0 transition-opacity hover:opacity-80 rounded-md focus-visible:outline-2 focus-visible:outline-blue-600">
         <%= image_tag "logo_gobierno_municipal.png", alt: "Logo Municipio", class: "h-10 w-auto dark:hidden" %>
         <%= image_tag "logo_gobierno_municipal_light.png", alt: "Logo Municipio", class: "h-10 w-auto hidden dark:block" %>
         <h1 class="text-lg font-bold text-gray-900 dark:text-neutral-100 hidden sm:block">Mascotas</h1>
@@ -49,17 +49,19 @@
               <%= render "shared/components/dark_mode_switcher/dark_mode_switcher", variant: "segmented", classes: "w-full flex justify-center" %>
             </div>
 
-            <div>
-              <%= render "shared/components/buttons/button",
-                text: "Reportes",
-                href: reports_path,
-                variant: "secondary",
-                style: "fancy",
-                size: "sm",
-                full_width: true,
-                classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
-              %>
-            </div>
+            <% unless Current.account&.admin? %>
+              <div>
+                <%= render "shared/components/buttons/button",
+                  text: "Reportes",
+                  href: reports_path,
+                  variant: "secondary",
+                  style: "fancy",
+                  size: "sm",
+                  full_width: true,
+                  classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
+                %>
+              </div>
+            <% end %>
 
             <% if Current.account&.cuidado_animal? %>
               <div>

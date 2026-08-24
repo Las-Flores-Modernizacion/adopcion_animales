@@ -14,6 +14,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "login exitoso de un admin redirige al panel de administración" do
+    sign_in_as users(:admin)
+    assert_redirected_to admin_root_path
+  end
+
   test "login con un email nuevo crea la cuenta y el usuario" do
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:google] = OmniAuth::AuthHash.new(
