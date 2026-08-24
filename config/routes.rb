@@ -22,8 +22,12 @@ Rails.application.routes.draw do
 
   resources :reports, path: "reportes" do
     resources :sightings, only: [ :new, :create ], path: "avistamientos"
+    member do
+      patch :found, path: "encontrado"
+    end
   end
   resources :animals, only: [ :index ], path: "animales"
+  resource :profile, only: [ :edit, :update ], path: "perfil"
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

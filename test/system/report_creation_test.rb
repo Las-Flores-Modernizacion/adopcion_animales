@@ -61,7 +61,7 @@ class ReportCreationTest < ApplicationSystemTestCase
     click_on "Registrar avistamiento"
 
     assert_current_path report_path(reporte)
-    assert_text "¡Avistamiento registrado!"
+    assert_text "¡Gracias por ayudar!"
     assert_text "Cronología de avistamientos"
   end
 

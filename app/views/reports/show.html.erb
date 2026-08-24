@@ -98,13 +98,15 @@
           </p>
         <% end %>
 
-        <%= render "shared/components/buttons/button",
-            text: "¿Lo viste? Registrar avistamiento",
-            href: new_report_sighting_path(@report),
-            style: "fancy",
-            variant: "primary",
-            classes: "w-full justify-center"
-        %>
+        <% unless @report.status.in?(%w[adoptado encontrado]) %>
+          <% if @report.user_id == Current.user.id %>
+            <%= button_to "Ya lo encontré", found_report_path(@report), method: :patch,
+                class: "inline-flex items-center justify-center gap-1.5 w-full rounded-lg border border-emerald-300/30 bg-emerald-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-all duration-100 ease-in-out hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600",
+                data: { turbo_confirm: "¿Confirmás que ya encontraste a tu mascota?" } %>
+          <% else %>
+            <%= render "reports/help_menu", report: @report %>
+          <% end %>
+        <% end %>
       </div>
 
       <!-- Cronología -->
@@ -141,7 +143,7 @@
     </div>
   </div>
 
-  <% if sightings.any? %>
+  <% if sightings.any? && @report.status.in?(%w[perdido avistado]) %>
     <% markers = sightings.reverse.map { |s| { lat: s.location.latitude.to_f, lng: s.location.longitude.to_f, label: status_label(s.status), date: s.created_at.strftime("%d/%m/%Y %H:%M") } } %>
 
     <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 mt-6">

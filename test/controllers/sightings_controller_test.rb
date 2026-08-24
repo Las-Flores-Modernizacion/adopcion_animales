@@ -45,6 +45,31 @@ class SightingsControllerTest < ActionDispatch::IntegrationTest
     assert_in_delta(-34.7, @reporte.location.latitude.to_f, 0.01)
   end
 
+  test "new preselecciona el estado pedido por query param" do
+    sign_in_as @maria
+    get new_report_sighting_path(@reporte, status: "en_transito")
+    assert_response :success
+    assert_select "select[name='sighting[status]'] option[selected][value=en_transito]"
+  end
+
+  test "new ignora un estado inválido y usa avistado por defecto" do
+    sign_in_as @maria
+    get new_report_sighting_path(@reporte, status: "no_es_un_estado")
+    assert_response :success
+    assert_select "select[name='sighting[status]'] option[selected][value=avistado]"
+  end
+
+  test "create guarda el teléfono de contacto en el perfil del usuario" do
+    sign_in_as @maria
+
+    post report_sightings_path(@reporte), params: {
+      location: { browser_lat: "-34.7", browser_lng: "-58.5" },
+      sighting: { status: "en_transito", phone_number: "2244 111111" }
+    }
+
+    assert_equal "2244 111111", @maria.account.reload.phone_number
+  end
+
   test "create no permite avistar un reporte en borrador" do
     sign_in_as @maria
     @reporte.update!(draft: true)

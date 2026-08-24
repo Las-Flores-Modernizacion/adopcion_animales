@@ -141,6 +141,48 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "show muestra el mapa solo si el animal sigue perdido o avistado" do
+    sign_in_as @maria
+    @reporte.sightings.create!(user: @tomas, location: @reporte.location, status: "perdido")
+
+    get report_path(@reporte)
+    assert_includes response.body, "Mapa de avistamientos"
+
+    @reporte.update!(status: "en_transito")
+    get report_path(@reporte)
+    assert_not_includes response.body, "Mapa de avistamientos"
+  end
+
+  test "show le ofrece 'Ya lo encontré' al dueño y el menú Ayudar a otros" do
+    sign_in_as @tomas
+    get report_path(@reporte)
+    assert_includes response.body, "Ya lo encontré"
+
+    sign_in_as @maria
+    get report_path(@reporte)
+    assert_not_includes response.body, "Ya lo encontré"
+    assert_includes response.body, "Ayudar"
+  end
+
+  test "found marca el reporte propio como encontrado" do
+    sign_in_as @tomas
+
+    assert_difference "@reporte.sightings.count", 1 do
+      patch found_report_path(@reporte)
+    end
+
+    assert_redirected_to report_path(@reporte)
+    assert_equal "encontrado", @reporte.reload.status
+  end
+
+  test "found no permite marcar el reporte de otro usuario" do
+    sign_in_as @tomas
+
+    patch found_report_path(@reporte_de_maria)
+    assert_response :not_found
+    assert_not_equal "encontrado", @reporte_de_maria.reload.status
+  end
+
   test "update no permite publicar un reporte de otro usuario" do
     sign_in_as @tomas
 

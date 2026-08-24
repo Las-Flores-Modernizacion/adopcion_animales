@@ -68,6 +68,16 @@ class ReportsController < ApplicationController
     redirect_to reports_path, notice: "Reporte eliminado."
   end
 
+  # El dueño original del reporte marca que ya encontró a su mascota.
+  def found
+    @report = Current.user.reports.find(params[:id])
+    @report.record_sighting(
+      user: Current.user, location: @report.location,
+      aggressive: false, is_hurt: false, is_anxious: false, urgent: false, status: "encontrado"
+    )
+    redirect_to report_path(@report), notice: "¡Qué alegría! Marcamos el reporte como encontrado."
+  end
+
   private
 
   def page_param(value)

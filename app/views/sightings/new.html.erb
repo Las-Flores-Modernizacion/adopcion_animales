@@ -1,10 +1,33 @@
-<% content_for :title, "Nuevo Avistamiento" %>
+<%
+  page_copy = {
+    "avistado" => {
+      title: "Registrar Avistamiento",
+      subtitle: "Contanos dónde y cómo viste a este animal ahora. Confirmá tu ubicación GPS actual.",
+      submit: "Registrar avistamiento"
+    },
+    "en_transito" => {
+      title: "Dar Tránsito",
+      subtitle: "Vas a alojar a este animal temporalmente en tu hogar mientras se busca un adoptante. Dejanos tu teléfono para que puedan contactarte.",
+      submit: "Confirmar tránsito"
+    },
+    "en_proceso_adopcion" => {
+      title: "Solicitar Adopción",
+      subtitle: "Tu solicitud queda registrada. El área de Cuidado Animal del municipio se va a contactar para coordinar los siguientes pasos.",
+      submit: "Solicitar adopción"
+    }
+  }.fetch(@status, {
+    title: "Registrar Novedad",
+    subtitle: "Contanos la novedad sobre este animal.",
+    submit: "Guardar"
+  })
+%>
+<% content_for :title, page_copy[:title] %>
 
 <div class="max-w-2xl mx-auto py-8 px-4 sm:px-6">
   <div class="mb-8">
-    <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Registrar Avistamiento</h1>
+    <h1 class="text-3xl font-bold text-neutral-900 dark:text-white"><%= page_copy[:title] %></h1>
     <p class="text-neutral-500 mt-2">
-      Contanos dónde y cómo viste a este animal ahora. Confirmá tu ubicación GPS actual.
+      <%= page_copy[:subtitle] %>
     </p>
   </div>
 
@@ -43,8 +66,15 @@
           label: "¿Cómo está ahora?",
           name: "sighting[status]",
           options: Report::STATUSES.keys.map { |s| [status_label(s), s] },
-          selected: "avistado",
+          selected: @status,
           required: true %>
+
+      <%= render "shared/components/forms/form_group",
+          label: "Teléfono de contacto (opcional)",
+          name: "sighting[phone_number]",
+          helper_text: "Se guarda en tu perfil para que puedan contactarte por este caso." do %>
+        <%= text_field_tag "sighting[phone_number]", Current.account.phone_number, class: "form-control" %>
+      <% end %>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <%= form.hidden_field :urgent, value: "0" %>
@@ -120,7 +150,7 @@
 
     <div class="flex justify-end gap-3 pt-2">
       <%= render "shared/components/buttons/button",
-          text: "Registrar avistamiento",
+          text: page_copy[:submit],
           type: "submit",
           style: "fancy",
           variant: "primary",
