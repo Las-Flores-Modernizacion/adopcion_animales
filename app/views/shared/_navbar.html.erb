@@ -81,6 +81,16 @@
         <div class="flex items-center gap-3">
           <%= render "shared/components/dark_mode_switcher/dark_mode_switcher", variant: "cycle_icon" %>
 
+          <% if Rails.env.development? %>
+            <%= render "shared/components/buttons/button",
+              text: "Dev login",
+              href: dev_login_path,
+              variant: "secondary",
+              style: "basic",
+              size: "md"
+            %>
+          <% end %>
+
           <%= form_with url: "/auth/google", method: :post, data: { turbo: false } do %>
             <%= render "shared/components/buttons/button",
               text: "Iniciar sesión",

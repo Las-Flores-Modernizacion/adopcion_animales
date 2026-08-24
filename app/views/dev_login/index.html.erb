@@ -1,0 +1,46 @@
+<% content_for :title, "Dev login" %>
+
+<div class="w-full max-w-2xl space-y-6">
+  <div class="space-y-1">
+    <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Dev login</h1>
+    <p class="text-sm text-neutral-500 dark:text-neutral-400">
+      Solo visible en development. Elegí una cuenta para entrar sin pasar por Google.
+    </p>
+  </div>
+
+  <%= render "shared/components/card/card", padding: "none", divide: true do %>
+    <% if @accounts.any? %>
+      <ul class="divide-y divide-black/10 dark:divide-white/10">
+        <% @accounts.each do |account| %>
+          <li class="flex items-center justify-between gap-4 px-4 py-4 sm:px-6">
+            <div class="flex items-center gap-3 min-w-0">
+              <%= render "shared/components/avatar/avatar",
+                alt: account.full_name.titleize,
+                src: account.avatar_url,
+                size: "md"
+              %>
+              <div class="min-w-0">
+                <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-100 truncate">
+                  <%= account.full_name.titleize %>
+                </p>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+                  <%= account.email_address %>
+                </p>
+              </div>
+            </div>
+
+            <%= button_to "Entrar", dev_login_account_path(account), method: :post,
+              class: "inline-flex items-center justify-center gap-1.5 rounded-lg border border-neutral-400/30 bg-neutral-800 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-all duration-100 ease-in-out hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-600 dark:bg-white dark:text-neutral-800 dark:hover:bg-neutral-100 dark:focus-visible:outline-neutral-200" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="px-4 py-6 text-sm text-neutral-500 dark:text-neutral-400 sm:px-6">
+        Todavía no hay cuentas en la base de development.
+      </p>
+    <% end %>
+  <% end %>
+
+  <%= button_to "Crear cuenta de prueba y entrar", dev_login_new_account_path, method: :post,
+    class: "inline-flex items-center justify-center gap-1.5 rounded-lg border border-black/10 bg-white/90 px-3.5 py-2 text-sm font-medium text-neutral-800 shadow-xs transition-all duration-100 ease-in-out hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-600 dark:border-white/10 dark:bg-neutral-700/50 dark:text-neutral-50 dark:hover:bg-neutral-700/75 dark:focus-visible:outline-neutral-200" %>
+</div>
