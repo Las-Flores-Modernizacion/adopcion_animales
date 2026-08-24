@@ -65,7 +65,7 @@
       <%= render "shared/components/select/select",
           label: "¿Cómo está ahora?",
           name: "sighting[status]",
-          options: Report::STATUSES.keys.map { |s| [status_label(s), s] },
+          options: (Report::STATUSES.keys.map(&:to_s) - [ "adoptado" ]).map { |s| [status_label(s), s] },
           selected: @status,
           required: true %>
 

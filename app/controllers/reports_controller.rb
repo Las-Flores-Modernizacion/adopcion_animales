@@ -2,6 +2,14 @@
 class ReportsController < ApplicationController
   REPORTS_PER_PAGE = 12
 
+  before_action :require_cuidado_animal!, only: [ :adoption_requests, :approve_adoption, :reject_adoption ]
+
+  # Solicitudes de adopción pendientes, para el área de Cuidado Animal del municipio.
+  def adoption_requests
+    @reports = Report.published.where(status: "en_proceso_adopcion")
+      .includes(:animal, :location).with_attached_photo.order(created_at: :desc)
+  end
+
   def index
     @current_tab = params[:tab] || "own"
 
@@ -78,7 +86,31 @@ class ReportsController < ApplicationController
     redirect_to report_path(@report), notice: "¡Qué alegría! Marcamos el reporte como encontrado."
   end
 
+  # El área de Cuidado Animal aprueba una solicitud de adopción pendiente.
+  def approve_adoption
+    @report = Report.published.where(status: "en_proceso_adopcion").find(params[:id])
+    @report.record_sighting(
+      user: Current.user, location: @report.location,
+      aggressive: false, is_hurt: false, is_anxious: false, urgent: false, status: "adoptado"
+    )
+    redirect_to report_path(@report), notice: "Adopción aprobada."
+  end
+
+  # El área de Cuidado Animal rechaza una solicitud (vuelve a tránsito).
+  def reject_adoption
+    @report = Report.published.where(status: "en_proceso_adopcion").find(params[:id])
+    @report.record_sighting(
+      user: Current.user, location: @report.location,
+      aggressive: false, is_hurt: false, is_anxious: false, urgent: false, status: "en_transito"
+    )
+    redirect_to report_path(@report), notice: "Solicitud de adopción rechazada."
+  end
+
   private
+
+  def require_cuidado_animal!
+    head :forbidden unless Current.account&.cuidado_animal?
+  end
 
   def page_param(value)
     page = value.to_i

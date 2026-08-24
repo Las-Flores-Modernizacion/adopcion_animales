@@ -1,6 +1,11 @@
 class Account < ApplicationRecord
   has_secure_password validations: false
 
+  # cuidado_animal: personal del área de Cuidado Animal del municipio, único
+  # rol habilitado para aprobar o rechazar solicitudes de adopción. Se asigna
+  # manualmente (consola/seed), no hay alta de rol por la propia app.
+  enum :role, { vecino: 0, cuidado_animal: 1 }
+
   belongs_to :user, dependent: :destroy
   has_many :sessions, dependent: :destroy
 

@@ -70,6 +70,17 @@ class SightingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "2244 111111", @maria.account.reload.phone_number
   end
 
+  test "create no permite asignar el estado adoptado desde un avistamiento común" do
+    sign_in_as @maria
+
+    post report_sightings_path(@reporte), params: {
+      location: { browser_lat: "-34.7", browser_lng: "-58.5" },
+      sighting: { status: "adoptado" }
+    }
+
+    assert_equal "avistado", @reporte.reload.status
+  end
+
   test "create no permite avistar un reporte en borrador" do
     sign_in_as @maria
     @reporte.update!(draft: true)

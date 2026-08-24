@@ -36,8 +36,11 @@ class SightingsController < ApplicationController
 
   private
 
+  # "adoptado" no es un estado que se pueda cargar desde un avistamiento común:
+  # solo lo asigna el área de Cuidado Animal al aprobar una solicitud
+  # (ver ReportsController#approve_adoption).
   def valid_status(status)
-    status.presence_in(Report::STATUSES.keys.map(&:to_s))
+    status.presence_in(Report::STATUSES.keys.map(&:to_s) - [ "adoptado" ])
   end
 
   def location_params

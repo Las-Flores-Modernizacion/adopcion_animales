@@ -24,6 +24,11 @@ Rails.application.routes.draw do
     resources :sightings, only: [ :new, :create ], path: "avistamientos"
     member do
       patch :found, path: "encontrado"
+      patch :approve_adoption, path: "aprobar-adopcion"
+      patch :reject_adoption, path: "rechazar-adopcion"
+    end
+    collection do
+      get :adoption_requests, path: "solicitudes-adopcion"
     end
   end
   resources :animals, only: [ :index ], path: "animales"

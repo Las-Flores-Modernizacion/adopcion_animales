@@ -183,6 +183,50 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_not_equal "encontrado", @reporte_de_maria.reload.status
   end
 
+  test "adoption_requests solo es accesible para cuenta cuidado_animal" do
+    sign_in_as @maria
+    get adoption_requests_reports_path
+    assert_response :forbidden
+
+    @maria.account.update!(role: "cuidado_animal")
+    get adoption_requests_reports_path
+    assert_response :success
+  end
+
+  test "adoption_requests lista solo reportes en proceso de adopción" do
+    @reporte.update!(status: "en_proceso_adopcion")
+    @maria.account.update!(role: "cuidado_animal")
+    sign_in_as @maria
+
+    get adoption_requests_reports_path
+    assert_includes response.body, report_path(@reporte)
+    assert_not_includes response.body, report_path(@reporte_de_maria)
+  end
+
+  test "approve_adoption marca el reporte como adoptado, solo para cuidado_animal" do
+    @reporte.update!(status: "en_proceso_adopcion")
+    sign_in_as @maria
+
+    patch approve_adoption_report_path(@reporte)
+    assert_response :forbidden
+    assert_equal "en_proceso_adopcion", @reporte.reload.status
+
+    @maria.account.update!(role: "cuidado_animal")
+    patch approve_adoption_report_path(@reporte)
+    assert_redirected_to report_path(@reporte)
+    assert_equal "adoptado", @reporte.reload.status
+  end
+
+  test "reject_adoption vuelve el reporte a en_transito, solo para cuidado_animal" do
+    @reporte.update!(status: "en_proceso_adopcion")
+    @maria.account.update!(role: "cuidado_animal")
+    sign_in_as @maria
+
+    patch reject_adoption_report_path(@reporte)
+    assert_redirected_to report_path(@reporte)
+    assert_equal "en_transito", @reporte.reload.status
+  end
+
   test "update no permite publicar un reporte de otro usuario" do
     sign_in_as @tomas
 

@@ -61,6 +61,20 @@
               %>
             </div>
 
+            <% if Current.account&.cuidado_animal? %>
+              <div>
+                <%= render "shared/components/buttons/button",
+                  text: "Solicitudes de adopción",
+                  href: adoption_requests_reports_path,
+                  variant: "secondary",
+                  style: "fancy",
+                  size: "sm",
+                  full_width: true,
+                  classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
+                %>
+              </div>
+            <% end %>
+
             <div>
               <%= render "shared/components/buttons/button",
                 text: "Mi perfil",
