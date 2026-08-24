@@ -91,7 +91,7 @@
       <% else %>
         <%= render "shared/components/buttons/button", text: "Ver", href: report_path(report), variant: "secondary", size: "sm", classes: "flex-1" %>
         <% unless report.status.in?(%w[adoptado encontrado]) %>
-          <%= render "reports/help_menu", report: report, classes: "flex-1" %>
+          <%= render "reports/help_menu", report: report, classes: "flex-1", direction: "up" %>
         <% end %>
       <% end %>
     </div>
