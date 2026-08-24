@@ -4,18 +4,23 @@
 <% latest_sighting = @report.sightings.order(created_at: :desc).first %>
 
 <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6">
-  <%= link_to reports_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 mb-6 transition-colors" do %>
-    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-    Volver a reportes
-  <% end %>
+  <div class="mb-6">
+    <%= render "shared/components/buttons/button",
+        text: "Volver a reportes",
+        href: reports_path,
+        variant: "ghost",
+        size: "sm",
+        icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>'
+    %>
+  </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
     <!-- Columna principal: fotos + identificación -->
     <div class="lg:col-span-3 space-y-6">
       <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
         <% if @report.photo.attached? %>
-          <% slides = @report.photo.map { |p| { content: image_tag(p, class: "w-full h-80 sm:h-96 object-cover") } } %>
-          <%= render "shared/components/carousel/carousel", slides: slides, slide_size: "full", dots: true, buttons: true, show_gradients: false %>
+          <% slides = @report.photo.map { |p| { content: image_tag(p, class: "w-full h-80 sm:h-96 object-contain bg-neutral-100 dark:bg-neutral-950") } } %>
+          <%= render "shared/components/carousel/carousel", slides: slides, slide_size: "full", dots: true, buttons: true, show_gradients: false, edge_to_edge: true %>
         <% else %>
           <div class="w-full h-80 sm:h-96 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,22 +72,20 @@
       <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 space-y-4">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium text-neutral-500">Estado actual</span>
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold <%= status_badge_classes(@report.status) %>">
-            <%= status_label(@report.status) %>
-          </span>
+          <%= render "shared/components/badge/badge", text: status_label(@report.status), variant: status_badge_variant(@report.status), pill: true %>
         </div>
 
         <% badges = [
-          (["Urgente", "bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300"] if @report.urgent?),
-          (["Herido", "bg-orange-100 text-orange-800 dark:bg-orange-950/60 dark:text-orange-300"] if @report.is_hurt?),
-          (["Ansioso", "bg-yellow-100 text-yellow-800 dark:bg-yellow-950/60 dark:text-yellow-300"] if @report.is_anxious?),
-          (["Comportamiento agresivo", "bg-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200"] if @report.aggressive?)
+          (["Urgente", "red"] if @report.urgent?),
+          (["Herido", "orange"] if @report.is_hurt?),
+          (["Ansioso", "yellow"] if @report.is_anxious?),
+          (["Comportamiento agresivo", "neutral"] if @report.aggressive?)
         ].compact %>
 
         <% if badges.any? %>
           <div class="flex flex-wrap gap-2">
-            <% badges.each do |label, classes| %>
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg <%= classes %>"><%= label %></span>
+            <% badges.each do |label, variant| %>
+              <%= render "shared/components/badge/badge", text: label, variant: variant %>
             <% end %>
           </div>
         <% end %>
@@ -122,9 +125,7 @@
 
               <div class="min-w-0 pt-1">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full <%= status_badge_classes(sighting.status) %>">
-                    <%= status_label(sighting.status) %>
-                  </span>
+                  <%= render "shared/components/badge/badge", text: status_label(sighting.status), variant: status_badge_variant(sighting.status), size: "sm", pill: true %>
                   <span class="text-sm font-medium text-neutral-900 dark:text-white"><%= sighting.user.full_name.titleize %></span>
                 </div>
                 <p class="text-xs text-neutral-500 mt-1">
