@@ -1,15 +1,19 @@
 class Report < ApplicationRecord
+  STATUSES = { perdido: 0, avistado: 1, en_transito: 2, en_proceso_adopcion: 3, adoptado: 4, encontrado: 5 }.freeze
+
   belongs_to :user
   belongs_to :location
   belongs_to :animal, optional: true
 
+  has_many :sightings, dependent: :destroy
   has_many_attached :photo
 
-  enum :status, { perdido: 0, avistado: 1, en_transito: 2, en_proceso_adopcion: 3, adoptado: 4, encontrado: 5 }
+  enum :status, STATUSES
 
   accepts_nested_attributes_for :animal, update_only: true
 
   validates :location, presence: true
+  validates :animal_id, uniqueness: true, allow_nil: true
   validate :photo_presence
   validate :accepted_file_types
   validate :accepted_file_size
@@ -18,8 +22,8 @@ class Report < ApplicationRecord
   scope :published, -> { where(draft: false).or(where(draft: nil)) }
   scope :community, -> { published.where.not(user_id: Current.user.id) }
 
-  def self.build_draft(user, location_params, photos, animal_id = nil)
-    report = user.reports.build(draft: true, animal_id: animal_id.presence)
+  def self.build_draft(user, location_params, photos)
+    report = user.reports.build(draft: true)
 
     report.build_location(
       latitude: location_params[:browser_lat],
@@ -28,6 +32,28 @@ class Report < ApplicationRecord
 
     report.photo.attach(photos) if photos.present?
     report
+  end
+
+  # Registra un avistamiento (el primero, al publicar, o uno posterior de la
+  # comunidad) como entrada de la cronología, y refleja ese estado como el
+  # actual del reporte. Devuelve el Sighting (persistido o no, si es inválido).
+  def record_sighting(user:, location:, aggressive:, is_hurt:, is_anxious:, urgent:, status:)
+    sighting = sightings.build(
+      user: user, location: location,
+      aggressive: aggressive, is_hurt: is_hurt, is_anxious: is_anxious, urgent: urgent, status: status
+    )
+
+    transaction do
+      sighting.save!
+      update!(
+        location: location,
+        aggressive: aggressive, is_hurt: is_hurt, is_anxious: is_anxious, urgent: urgent, status: status
+      )
+    end
+
+    sighting
+  rescue ActiveRecord::RecordInvalid
+    sighting
   end
 
   private

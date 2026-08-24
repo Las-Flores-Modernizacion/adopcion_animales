@@ -21,7 +21,9 @@ Rails.application.routes.draw do
     post "/dev_login/:id", to: "dev_login#create", as: :dev_login_account
   end
 
-  resources :reports, path: "reportes"
+  resources :reports, path: "reportes" do
+    resources :sightings, only: [ :new, :create ], path: "avistamientos"
+  end
   resources :animals, only: [ :index ], path: "animales"
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)

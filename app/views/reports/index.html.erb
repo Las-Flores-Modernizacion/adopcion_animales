@@ -78,10 +78,11 @@
                 </div>
               </div>
 
-              <div class="mt-auto pt-4 border-t border-neutral-100 dark:border-neutral-800">
-                <%= link_to edit_report_path(id: report.id), class: "block w-full text-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-semibold text-sm px-4 py-2.5 rounded-xl transition" do %>
-                  Editar
+              <div class="mt-auto pt-4 border-t border-neutral-100 dark:border-neutral-800 flex gap-2">
+                <% unless report.draft? %>
+                  <%= link_to "Ver", report_path(report), class: "flex-1 text-center bg-white hover:bg-neutral-50 dark:bg-neutral-800 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 font-semibold text-sm px-4 py-2.5 rounded-xl transition" %>
                 <% end %>
+                <%= link_to "Editar", edit_report_path(id: report.id), class: "flex-1 text-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-semibold text-sm px-4 py-2.5 rounded-xl transition" %>
               </div>
             </div>
           </div>
@@ -162,13 +163,14 @@
                 </div>
               </div>
 
-              <div class="mt-auto pt-4 border-t border-neutral-100 dark:border-neutral-800">
+              <div class="mt-auto pt-4 border-t border-neutral-100 dark:border-neutral-800 flex gap-2">
+                <%= link_to "Ver", report_path(report), class: "flex-1 text-center bg-white hover:bg-neutral-50 dark:bg-neutral-800 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 font-semibold text-sm px-4 py-2.5 rounded-xl transition" %>
                 <%= render "shared/components/buttons/button",
                   text: "Ayudar",
-                  href: "#",
+                  href: new_report_sighting_path(report),
                   style: "fancy",
                   variant: "info",
-                  classes: "block w-full"
+                  classes: "flex-1"
                 %>
               </div>
             </div>

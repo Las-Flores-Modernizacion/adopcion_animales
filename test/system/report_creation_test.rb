@@ -45,22 +45,24 @@ class ReportCreationTest < ApplicationSystemTestCase
     assert_text "Perro"
   end
 
-  test "un usuario vincula un nuevo avistamiento a un animal ya reportado" do
+  test "un usuario registra un avistamiento de un animal ya reportado, sin crear un reporte nuevo" do
+    reporte = reports(:reporte) # animal: tito, ya publicado por otro usuario
+    reporte.photo.attach(io: file_fixture("colibri estatico.png").open, filename: "colibri.png", content_type: "image/png")
+
     visit reports_path
     click_on "Nuevo reporte"
 
-    select_remote_animal("report[animal_id]", "tito")
+    select_remote_animal("sighting_search", "tito")
 
-    attach_file "report[photo][]", file_fixture("colibri estatico.png"), make_visible: true
-    click_on "Siguiente paso"
+    assert_current_path new_report_sighting_path(reporte)
+    assert_text "Registrar Avistamiento"
+    assert_button "Registrar avistamiento", disabled: false
 
-    assert_text "Animal vinculado"
-    assert_no_selector "select[name='report[animal_attributes][species]']"
+    click_on "Registrar avistamiento"
 
-    click_on "Guardar y publicar reporte"
-
-    assert_current_path reports_path
-    assert_text "¡El reporte fue publicado con éxito!"
+    assert_current_path report_path(reporte)
+    assert_text "¡Avistamiento registrado!"
+    assert_text "Cronología de avistamientos"
   end
 
   private

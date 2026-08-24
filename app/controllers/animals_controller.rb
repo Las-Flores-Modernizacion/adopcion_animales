@@ -3,7 +3,7 @@ class AnimalsController < ApplicationController
   THUMBNAIL_SIZE = [ 80, 80 ]
 
   def index
-    animals = Animal.includes(reports: { photo_attachments: :blob })
+    animals = Animal.joins(:report).merge(Report.published).includes(report: { photo_attachments: :blob })
     animals = animals.where(species: params[:species]) if params[:species].present?
     animals = animals.where(size: params[:size]) if params[:size].present?
     animals = animals.where(search_condition, query: "%#{params[:query].strip.downcase}%") if params[:query].present?
@@ -18,11 +18,11 @@ class AnimalsController < ApplicationController
   end
 
   def animal_json(animal)
-    { id: animal.id, label: animal_label(animal), image: animal_thumbnail_url(animal) }
+    { id: animal.id, report_id: animal.report.id, label: animal_label(animal), image: animal_thumbnail_url(animal) }
   end
 
   def animal_thumbnail_url(animal)
-    photo = animal.reports.sort_by(&:created_at).reverse.filter_map { |report| report.photo.first }.first
+    photo = animal.report.photo.first
     return nil unless photo
 
     rails_representation_path(photo.variant(resize_to_fill: THUMBNAIL_SIZE), only_path: true)

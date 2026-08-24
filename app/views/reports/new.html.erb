@@ -6,6 +6,36 @@
     <p class="text-neutral-500 mt-2">Toma o sube fotos del animal y confirma tu ubicación GPS para iniciar el reporte.</p>
   </div>
 
+  <!-- Búsqueda de un animal ya reportado -->
+  <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-3 mb-6">
+    <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">¿Ya viste este animal reportado?</h3>
+    <p class="text-sm text-neutral-500">
+      Si es un animal que ya fue reportado por vos o por otra persona, buscalo acá para agregar una novedad
+      (dónde lo viste, cómo está) a su reporte, en vez de crear uno nuevo.
+    </p>
+
+    <%= render "shared/components/select/select",
+        name: "sighting_search",
+        url: animals_path,
+        value_field: "report_id",
+        label_field: "label",
+        image_field: "image",
+        dropdown_input: true,
+        placeholder: "Buscar animal ya reportado...",
+        dropdown_input_placeholder: "Especie, color, raza...",
+        data: {
+          controller: "select select-navigate",
+          "select-navigate-url-template-value": "/reportes/__ID__/avistamientos/new",
+          action: "change->select-navigate#navigate"
+        } %>
+  </div>
+
+  <div class="relative flex items-center gap-3 my-6 text-xs text-neutral-400">
+    <div class="flex-1 border-t border-neutral-200 dark:border-neutral-800"></div>
+    o reportá uno nuevo
+    <div class="flex-1 border-t border-neutral-200 dark:border-neutral-800"></div>
+  </div>
+
   <%= form_with(
     model: @report,
     url: reports_path,
@@ -28,22 +58,6 @@
     <!-- Coordenadas ocultas -->
     <%= hidden_field_tag "location[browser_lat]", nil, data: { gps_target: "lat" } %>
     <%= hidden_field_tag "location[browser_lng]", nil, data: { gps_target: "lng" } %>
-
-    <!-- Vinculación a un animal ya reportado -->
-    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-3">
-      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">¿Ya viste este animal reportado?</h3>
-      <p class="text-sm text-neutral-500">Si es un animal que ya fue reportado por vos o por otra persona, buscalo y vinculá este nuevo avistamiento. Si no, dejalo en blanco y vas a poder describirlo en el siguiente paso.</p>
-
-      <%= render "shared/components/select/select",
-          name: "report[animal_id]",
-          url: animals_path,
-          value_field: "id",
-          label_field: "label",
-          image_field: "image",
-          dropdown_input: true,
-          placeholder: "Buscar animal ya reportado (opcional)...",
-          dropdown_input_placeholder: "Especie, color, raza..." %>
-    </div>
 
     <!-- Selección de Fotos -->
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4" data-controller="image-preview">

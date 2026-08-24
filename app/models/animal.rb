@@ -1,5 +1,5 @@
 class Animal < ApplicationRecord
-  has_many :reports, dependent: :destroy
+  has_one :report, dependent: :destroy
 
   enum :size, { pequeño: 0, mediano: 1, grande: 2 }
   enum :species, { perro: 0, gato: 1 }
