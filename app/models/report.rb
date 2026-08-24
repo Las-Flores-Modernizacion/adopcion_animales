@@ -6,6 +6,7 @@ class Report < ApplicationRecord
   belongs_to :animal, optional: true
 
   has_many :sightings, dependent: :destroy
+  has_many :adoption_requests, dependent: :destroy
   has_many_attached :photo
 
   enum :status, STATUSES

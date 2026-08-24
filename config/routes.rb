@@ -22,6 +22,8 @@ Rails.application.routes.draw do
 
   resources :reports, path: "reportes" do
     resources :sightings, only: [ :new, :create ], path: "avistamientos"
+    resources :fosterings, only: [ :new, :create ], path: "transito"
+    resources :adoptions, only: [ :new, :create ], path: "adopcion"
     member do
       patch :found, path: "encontrado"
       patch :approve_adoption, path: "aprobar-adopcion"

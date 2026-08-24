@@ -12,6 +12,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <% @reports.each do |report| %>
         <% animal = report.animal %>
+        <% adoption_request = report.adoption_requests.max_by(&:created_at) %>
         <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden flex flex-col">
           <div class="h-40 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0">
             <% if report.photo.attached? %>
@@ -24,6 +25,39 @@
               <%= animal&.species.presence || "Especie desconocida" %>
             </h3>
             <p class="text-sm text-neutral-500 mb-4"><%= animal&.race.presence || "Raza sin especificar" %></p>
+
+            <% if adoption_request %>
+              <dl class="text-xs space-y-1.5 mb-4 border-t border-neutral-100 dark:border-neutral-800 pt-3">
+                <div class="flex justify-between gap-2">
+                  <dt class="text-neutral-500">Candidato</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100 font-medium text-right"><%= adoption_request.user.full_name.titleize %></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-neutral-500">Teléfono</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100 font-medium text-right"><%= adoption_request.phone_number %></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-neutral-500">Vivienda</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100 font-medium text-right capitalize"><%= adoption_request.housing_type %><%= " con patio" if adoption_request.has_yard? %></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-neutral-500">Convivientes</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100 font-medium text-right">
+                    <%= adoption_request.household_members_count.presence || "Sin especificar" %><%= ", con niños" if adoption_request.has_children? %>
+                  </dd>
+                </div>
+                <% if adoption_request.other_pets? %>
+                  <div>
+                    <dt class="text-neutral-500">Otros animales</dt>
+                    <dd class="text-neutral-800 dark:text-neutral-100"><%= adoption_request.other_pets_details %></dd>
+                  </div>
+                <% end %>
+                <div>
+                  <dt class="text-neutral-500">Motivación</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100"><%= adoption_request.motivation %></dd>
+                </div>
+              </dl>
+            <% end %>
 
             <div class="mt-auto pt-4 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
               <%= render "shared/components/buttons/button", text: "Ver detalle", href: report_path(report), variant: "secondary", size: "sm", full_width: true %>

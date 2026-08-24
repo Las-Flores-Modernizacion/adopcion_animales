@@ -1,21 +1,10 @@
 class SightingsController < ApplicationController
-  # Los únicos estados que se pueden cargar desde este formulario común (uno
-  # por cada opción del menú "Ayudar"). "perdido" es el estado inicial, no
-  # una acción; "encontrado" lo marca solo el dueño (ver ReportsController
-  # #found) y "adoptado" solo el área de Cuidado Animal al aprobar una
-  # solicitud (ver ReportsController#approve_adoption) — ninguno de los dos
-  # es asignable acá, aunque cualquier usuario esté logueado.
-  ASSIGNABLE_STATUSES = %w[avistado en_transito en_proceso_adopcion].freeze
-
   def new
     @report = Report.published.find(params[:report_id])
-    @status = valid_status(params[:status]) || "avistado"
   end
 
   def create
     @report = Report.published.find(params[:report_id])
-
-    Current.account.update(phone_number: sighting_params[:phone_number]) if sighting_params[:phone_number].present?
 
     location = Location.create!(
       latitude: location_params[:browser_lat],
@@ -28,31 +17,26 @@ class SightingsController < ApplicationController
       is_hurt: sighting_params[:is_hurt] == "1",
       is_anxious: sighting_params[:is_anxious] == "1",
       urgent: sighting_params[:urgent] == "1",
-      status: valid_status(sighting_params[:status]) || "avistado"
+      status: "avistado"
     )
 
     new_photos = Array(params.dig(:sighting, :photo)).reject(&:blank?)
     @report.photo.attach(new_photos) if new_photos.any?
 
     if sighting.persisted?
-      redirect_to report_path(@report), notice: "¡Gracias por ayudar! Actualizamos el estado del reporte."
+      redirect_to report_path(@report), notice: "¡Gracias por ayudar! Registramos tu avistamiento."
     else
-      @status = valid_status(sighting_params[:status]) || "avistado"
       render :new, status: :unprocessable_entity
     end
   end
 
   private
 
-  def valid_status(status)
-    status.presence_in(ASSIGNABLE_STATUSES)
-  end
-
   def location_params
     params.require(:location).permit(:browser_lat, :browser_lng)
   end
 
   def sighting_params
-    params.require(:sighting).permit(:aggressive, :is_hurt, :is_anxious, :urgent, :status, :phone_number, photo: [])
+    params.require(:sighting).permit(:aggressive, :is_hurt, :is_anxious, :urgent, photo: [])
   end
 end

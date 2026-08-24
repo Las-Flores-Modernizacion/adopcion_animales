@@ -1,7 +1,8 @@
 <%#
   Help Menu (Ayudar)
   Botón "Ayudar" con un desplegable de acciones distintas sobre el mismo reporte:
-  avistar, dar tránsito, pedir adopción. Reemplaza el link directo a "nuevo avistamiento".
+  avistar, dar tránsito, pedir adopción. Cada una tiene su propio formulario dedicado
+  (sightings/fosterings/adoptions), no hay un único formulario compartido.
 
   Required locals:
     - report: Report
@@ -38,15 +39,15 @@
        data-dropdown-fixed-position="true"
        data-dropdown-direction="<%= direction %>">
     <%= render "shared/components/buttons/button",
-        text: "Avisté a este animal", href: new_report_sighting_path(report, status: "avistado"),
+        text: "Avisté a este animal", href: new_report_sighting_path(report),
         variant: "secondary", style: "fancy", size: "sm", full_width: true, classes: "!justify-start" %>
 
     <%= render "shared/components/buttons/button",
-        text: "Le doy tránsito", href: new_report_sighting_path(report, status: "en_transito"),
+        text: "Le doy tránsito", href: new_report_fostering_path(report),
         variant: "secondary", style: "fancy", size: "sm", full_width: true, classes: "!justify-start" %>
 
     <%= render "shared/components/buttons/button",
-        text: "Quiero adoptarlo", href: new_report_sighting_path(report, status: "en_proceso_adopcion"),
+        text: "Quiero adoptarlo", href: new_report_adoption_path(report),
         variant: "secondary", style: "fancy", size: "sm", full_width: true, classes: "!justify-start" %>
   </div>
 </div>

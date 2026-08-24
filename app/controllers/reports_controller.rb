@@ -7,7 +7,7 @@ class ReportsController < ApplicationController
   # Solicitudes de adopción pendientes, para el área de Cuidado Animal del municipio.
   def adoption_requests
     @reports = Report.published.where(status: "en_proceso_adopcion")
-      .includes(:animal, :location).with_attached_photo.order(created_at: :desc)
+      .includes(:animal, :location, adoption_requests: { user: :account }).with_attached_photo.order(created_at: :desc)
   end
 
   def index

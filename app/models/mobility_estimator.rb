@@ -19,7 +19,10 @@ class MobilityEstimator
   end
 
   def probable_zone
-    sightings = @report.sightings.includes(:location).to_a
+    # Solo los avistamientos en la calle alimentan la estimación: la
+    # ubicación de un tránsito es el hogar de quien aloja al animal, no un
+    # punto de movilidad del animal por su cuenta.
+    sightings = @report.sightings.where(status: "avistado").includes(:location).to_a
     return nil if sightings.empty?
 
     { center: weighted_centroid(sightings), radius_km: radius_km(sightings) }
