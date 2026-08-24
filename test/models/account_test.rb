@@ -13,21 +13,21 @@ class AccountTest < ActiveSupport::TestCase
   test "requiere un email válido y único" do
     account = Account.new(first_name: "Sin", last_name: "Email")
     assert_not account.valid?
-    assert_includes account.errors[:email_address], "can't be blank"
+    assert_includes account.errors[:email_address], "no puede estar en blanco"
 
     account.email_address = "no-es-un-email"
     assert_not account.valid?
 
     account.email_address = @tomas.email_address
     assert_not account.valid?
-    assert_includes account.errors[:email_address], "has already been taken"
+    assert_includes account.errors[:email_address], "ya ha sido tomado"
   end
 
   test "una cuenta oauth requiere provider, uid y oauth_token válidos" do
     account = Account.new(email_address: "oauth@example.com", first_name: "O", last_name: "Auth", provider: "google")
     assert_not account.valid?
-    assert_includes account.errors[:uid], "can't be blank"
-    assert_includes account.errors[:oauth_token], "can't be blank"
+    assert_includes account.errors[:uid], "no puede estar en blanco"
+    assert_includes account.errors[:oauth_token], "no puede estar en blanco"
 
     account.provider = "facebook"
     account.uid = "123"
