@@ -115,61 +115,84 @@
     </div>
   </div>
 
-  <%= form.fields_for :animal do |animal_form| %>
-    <!-- Tarjeta: Identificación Básica -->
-    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
-      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Identificación del Animal</h3>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <%= render "shared/components/select/select",
-            label: "Especie",
-            name: "report[animal_attributes][species]",
-            options: Animal.species.keys.map { |s| [s.titleize, s] },
-            selected: animal_form.object.species,
-            placeholder: "Selecciona una...",
-            required: true %>
-
-        <%= render "shared/components/select/select",
-            label: "Tamaño aproximado",
-            name: "report[animal_attributes][size]",
-            options: Animal.sizes.keys.map { |s| [s.titleize, s] },
-            selected: animal_form.object.size,
-            placeholder: "Selecciona uno...",
-            required: true %>
-
-        <%= render "shared/components/forms/form_group",
-            label: "Color principal",
-            name: "report[animal_attributes][color]",
-            helper_text: "Ej. Negro con manchas blancas" do %>
-          <%= animal_form.text_field :color,
-              class: "form-control" %>
+  <% if local_assigns.fetch(:linked_existing_animal, false) %>
+    <!-- Tarjeta: Animal vinculado (solo lectura) -->
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-3">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Animal vinculado</h3>
+      <p class="text-sm text-neutral-500">
+        Este reporte es un nuevo avistamiento de un animal ya identificado por la comunidad.
+        La ficha de identificación no se puede editar desde acá.
+      </p>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+        <div><dt class="text-neutral-500">Especie</dt><dd class="text-neutral-900 dark:text-white"><%= report.animal.species&.titleize %></dd></div>
+        <div><dt class="text-neutral-500">Tamaño</dt><dd class="text-neutral-900 dark:text-white"><%= report.animal.size&.titleize %></dd></div>
+        <div><dt class="text-neutral-500">Color</dt><dd class="text-neutral-900 dark:text-white"><%= report.animal.color.presence || "Sin especificar" %></dd></div>
+        <div><dt class="text-neutral-500">Raza</dt><dd class="text-neutral-900 dark:text-white"><%= report.animal.race.presence || "Sin especificar" %></dd></div>
+        <% if report.animal.answer_to_name.present? %>
+          <div><dt class="text-neutral-500">Responde a</dt><dd class="text-neutral-900 dark:text-white"><%= report.animal.answer_to_name %></dd></div>
         <% end %>
+        <% if report.animal.unique_detail.present? %>
+          <div class="sm:col-span-2"><dt class="text-neutral-500">Rasgos distintivos</dt><dd class="text-neutral-900 dark:text-white"><%= report.animal.unique_detail %></dd></div>
+        <% end %>
+      </dl>
+    </div>
+  <% else %>
+    <%= form.fields_for :animal do |animal_form| %>
+      <!-- Tarjeta: Identificación Básica -->
+      <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Identificación del Animal</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <%= render "shared/components/select/select",
+              label: "Especie",
+              name: "report[animal_attributes][species]",
+              options: Animal.species.keys.map { |s| [s.titleize, s] },
+              selected: animal_form.object.species,
+              placeholder: "Selecciona una...",
+              required: true %>
+
+          <%= render "shared/components/select/select",
+              label: "Tamaño aproximado",
+              name: "report[animal_attributes][size]",
+              options: Animal.sizes.keys.map { |s| [s.titleize, s] },
+              selected: animal_form.object.size,
+              placeholder: "Selecciona uno...",
+              required: true %>
+
+          <%= render "shared/components/forms/form_group",
+              label: "Color principal",
+              name: "report[animal_attributes][color]",
+              helper_text: "Ej. Negro con manchas blancas" do %>
+            <%= animal_form.text_field :color,
+                class: "form-control" %>
+          <% end %>
+
+          <%= render "shared/components/forms/form_group",
+              label: "Raza",
+              name: "report[animal_attributes][race]",
+              helper_text: "Si la conoces" do %>
+            <%= animal_form.text_field :race,
+                class: "form-control" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Tarjeta: Detalles extra -->
+      <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Detalles adicionales</h3>
+        </div>
 
         <%= render "shared/components/forms/form_group",
-            label: "Raza",
-            name: "report[animal_attributes][race]",
-            helper_text: "Si la conoces" do %>
-          <%= animal_form.text_field :race,
+            label: "Rasgos distintivos",
+            name: "report[animal_attributes][unique_detail]",
+            helper_text: "Ej. Le falta media oreja, tiene un collar rojo sin chapa, cojea, etc." do %>
+          <%= animal_form.text_area :unique_detail,
+              rows: 3,
               class: "form-control" %>
         <% end %>
       </div>
-    </div>
-
-    <!-- Tarjeta: Detalles extra -->
-    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Detalles adicionales</h3>
-      </div>
-
-      <%= render "shared/components/forms/form_group",
-          label: "Rasgos distintivos",
-          name: "report[animal_attributes][unique_detail]",
-          helper_text: "Ej. Le falta media oreja, tiene un collar rojo sin chapa, cojea, etc." do %>
-        <%= animal_form.text_area :unique_detail,
-            rows: 3,
-            class: "form-control" %>
-      <% end %>
-    </div>
+    <% end %>
   <% end %>
 
   <!-- Tarjeta: Estado y Comportamiento -->

@@ -25,7 +25,7 @@ class ReportsController < ApplicationController
   def create
     photos = Array(report_step_one_params[:photo]).reject(&:blank?)
 
-    @report = Report.build_draft(Current.user, location_params, photos)
+    @report = Report.build_draft(Current.user, location_params, photos, report_step_one_params[:animal_id])
     if @report.save
       redirect_to edit_report_path(@report), notice: "Reporte inicial guardado."
     else
@@ -35,6 +35,7 @@ class ReportsController < ApplicationController
 
   def edit
     @report = Current.user.reports.find(params[:id])
+    @linked_existing_animal = @report.animal.present?
     @report.build_animal unless @report.animal
   end
 
@@ -42,9 +43,12 @@ class ReportsController < ApplicationController
     @report = Current.user.reports.find(params[:id])
     @report.draft = false
 
-    new_photos = Array(report_params[:photo]).reject(&:blank?)
+    params_to_apply = report_params
+    params_to_apply = params_to_apply.except(:animal_attributes) if @report.animal_id.present?
 
-    if @report.update(report_params.except(:photo))
+    new_photos = Array(params_to_apply[:photo]).reject(&:blank?)
+
+    if @report.update(params_to_apply.except(:photo))
       @report.photo.attach(new_photos) if new_photos.any?
       redirect_to reports_path, notice: "¡El reporte fue publicado con éxito!"
     else
@@ -75,7 +79,7 @@ class ReportsController < ApplicationController
   end
 
   def report_step_one_params
-    params.require(:report).permit(photo: [])
+    params.require(:report).permit(:animal_id, photo: [])
   end
 
   def report_params

@@ -67,6 +67,42 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_report_path(report)
   end
 
+  test "create vincula el reporte a un animal existente si se envía animal_id" do
+    sign_in_as @tomas
+
+    assert_difference [ "Report.count", "Location.count" ], 1 do
+      assert_no_difference "Animal.count" do
+        post reports_path, params: {
+          location: { browser_lat: "-34.6", browser_lng: "-58.4" },
+          report: { animal_id: animals(:tito).id, photo: [ fixture_file_upload("colibri estatico.png", "image/png") ] }
+        }
+      end
+    end
+
+    report = Report.order(:created_at).last
+    assert_equal animals(:tito), report.animal
+  end
+
+  test "update no permite editar la identificación de un animal vinculado a otro reporte" do
+    sign_in_as @tomas
+    otro_reporte = @tomas.reports.build(
+      location: Location.create!(latitude: -34.6, longitude: -58.4),
+      animal: animals(:tito),
+      draft: true
+    )
+    otro_reporte.photo.attach(io: file_fixture("colibri estatico.png").open, filename: "colibri.png", content_type: "image/png")
+    otro_reporte.save!
+
+    patch report_path(otro_reporte), params: {
+      report: { urgent: "1", animal_attributes: { id: animals(:tito).id, species: "gato" } }
+    }
+
+    assert_redirected_to reports_path
+    assert_not otro_reporte.reload.draft?
+    assert otro_reporte.urgent?
+    assert_equal "perro", animals(:tito).reload.species
+  end
+
   test "create no crea el reporte si falta la foto" do
     assert_no_difference "Report.count" do
       sign_in_as @tomas

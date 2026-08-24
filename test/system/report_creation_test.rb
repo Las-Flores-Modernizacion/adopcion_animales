@@ -44,4 +44,30 @@ class ReportCreationTest < ApplicationSystemTestCase
     assert_text "¡El reporte fue publicado con éxito!"
     assert_text "Perro"
   end
+
+  test "un usuario vincula un nuevo avistamiento a un animal ya reportado" do
+    visit reports_path
+    click_on "Nuevo reporte"
+
+    select_remote_animal("report[animal_id]", "tito")
+
+    attach_file "report[photo][]", file_fixture("colibri estatico.png"), make_visible: true
+    click_on "Siguiente paso"
+
+    assert_text "Animal vinculado"
+    assert_no_selector "select[name='report[animal_attributes][species]']"
+
+    click_on "Guardar y publicar reporte"
+
+    assert_current_path reports_path
+    assert_text "¡El reporte fue publicado con éxito!"
+  end
+
+  private
+
+  def select_remote_animal(field_name, option_text)
+    wrapper = find("select[name='#{field_name}'] + div.ts-wrapper", visible: :all)
+    wrapper.find(".ts-control").click
+    wrapper.find(".ts-dropdown .option", text: option_text, wait: 5).click
+  end
 end

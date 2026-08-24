@@ -18,8 +18,8 @@ class Report < ApplicationRecord
   scope :published, -> { where(draft: false).or(where(draft: nil)) }
   scope :community, -> { published.where.not(user_id: Current.user.id) }
 
-  def self.build_draft(user, location_params, photos)
-    report = user.reports.build(draft: true)
+  def self.build_draft(user, location_params, photos, animal_id = nil)
+    report = user.reports.build(draft: true, animal_id: animal_id.presence)
 
     report.build_location(
       latitude: location_params[:browser_lat],

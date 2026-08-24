@@ -29,6 +29,21 @@
     <%= hidden_field_tag "location[browser_lat]", nil, data: { gps_target: "lat" } %>
     <%= hidden_field_tag "location[browser_lng]", nil, data: { gps_target: "lng" } %>
 
+    <!-- Vinculación a un animal ya reportado -->
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-3">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">¿Ya viste este animal reportado?</h3>
+      <p class="text-sm text-neutral-500">Si es un animal que ya fue reportado por vos o por otra persona, buscalo y vinculá este nuevo avistamiento. Si no, dejalo en blanco y vas a poder describirlo en el siguiente paso.</p>
+
+      <%= render "shared/components/select/select",
+          name: "report[animal_id]",
+          url: animals_path,
+          value_field: "id",
+          label_field: "label",
+          dropdown_input: true,
+          placeholder: "Buscar animal ya reportado (opcional)...",
+          dropdown_input_placeholder: "Especie, color, raza..." %>
+    </div>
+
     <!-- Selección de Fotos -->
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4" data-controller="image-preview">
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Fotografías del Animal</h3>
