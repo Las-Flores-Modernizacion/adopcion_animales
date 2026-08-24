@@ -62,7 +62,7 @@ class ReportCreationTest < ApplicationSystemTestCase
 
     assert_current_path report_path(reporte)
     assert_text "¡Gracias por ayudar!"
-    assert_text "Cronología de avistamientos"
+    assert_text "Cronología"
   end
 
   private

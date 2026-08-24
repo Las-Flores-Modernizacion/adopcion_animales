@@ -122,7 +122,7 @@
 
       <!-- Cronología -->
       <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
-        <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-4">Cronología de avistamientos</h2>
+        <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-4">Cronología</h2>
 
         <ul class="space-y-0">
           <% sightings.each_with_index do |sighting, index| %>
@@ -144,7 +144,6 @@
                 </div>
                 <p class="text-xs text-neutral-500 mt-1">
                   <%= time_ago_in_words(sighting.created_at) %> atrás
-                  · lat <%= number_with_precision(sighting.location.latitude, precision: 4) %>, lng <%= number_with_precision(sighting.location.longitude, precision: 4) %>
                 </p>
               </div>
             </li>
