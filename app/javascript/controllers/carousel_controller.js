@@ -51,7 +51,7 @@ export default class extends Controller {
     this.setupKeyboardNavigation(); // Always setup keyboard nav for viewport
 
     this.embla.on("select", this.updateControls);
-    this.embla.on("reInit", this.updateControls);
+    this.embla.on("reInit", this.handleReInit);
 
     // Safari compatibility: Ensure viewport is ready for focus
     requestAnimationFrame(() => {
@@ -69,6 +69,12 @@ export default class extends Controller {
     setTimeout(() => {
       this.establishConnections();
     }, 200);
+
+    // If the carousel connects while hidden (e.g. inside an inactive tab panel),
+    // Embla measures a zero-width container and ends up with a broken snap list
+    // that a later display change never fixes on its own. Watch for the first
+    // time it actually becomes visible and reInit once that happens.
+    this.setupVisibilityRecovery();
   }
 
   shouldCenterFirstSlide() {
@@ -80,6 +86,10 @@ export default class extends Controller {
       this.embla.destroy();
     }
     this.teardownKeyboardNavigation();
+    if (this.visibilityObserver) {
+      this.visibilityObserver.disconnect();
+      this.visibilityObserver = null;
+    }
 
     // Clean up carousel connections
     if (this.thumbnailCarousel) {
@@ -88,6 +98,21 @@ export default class extends Controller {
     if (this.mainCarousel) {
       this.mainCarousel = null;
     }
+  }
+
+  // --- Visibility Recovery ---
+  setupVisibilityRecovery() {
+    if (typeof IntersectionObserver === "undefined") return;
+
+    this.visibilityObserver = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (entry.isIntersecting && entry.boundingClientRect.width > 0) {
+        this.visibilityObserver.disconnect();
+        this.visibilityObserver = null;
+        this.embla?.reInit();
+      }
+    });
+    this.visibilityObserver.observe(this.viewportTarget);
   }
 
   // --- Thumbnail Carousel Connection ---
@@ -426,6 +451,16 @@ export default class extends Controller {
     if (this.thumbnailCarousel && this.thumbnailCarousel.updateThumbnails) {
       this.thumbnailCarousel.updateThumbnails(selectedIndex);
     }
+  };
+
+  // reInit can change the number of scroll snaps (e.g. once a hidden carousel
+  // is measured correctly for the first time), so the dots need to be rebuilt
+  // rather than just restyled.
+  handleReInit = () => {
+    if (this.dotsValue) {
+      this.generateDots();
+    }
+    this.updateControls();
   };
 
   // --- Keyboard Navigation ---
