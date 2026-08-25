@@ -72,9 +72,13 @@ export default class extends Controller {
 
     // If the carousel connects while hidden (e.g. inside an inactive tab panel),
     // Embla measures a zero-width container and ends up with a broken snap list
-    // that a later display change never fixes on its own. Watch for the first
-    // time it actually becomes visible and reInit once that happens.
-    this.setupVisibilityRecovery();
+    // that a later display change never fixes on its own. Only watch for recovery
+    // in that specific case: calling reInit() on an already-healthy carousel can
+    // race with an in-flight scroll animation (e.g. a "next" click fired right
+    // after connect) and freeze it mid-scroll, so this must stay opt-in.
+    if (this.viewportTarget.offsetWidth === 0) {
+      this.setupVisibilityRecovery();
+    }
   }
 
   shouldCenterFirstSlide() {
