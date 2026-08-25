@@ -1,0 +1,83 @@
+<% content_for :title, "Solicitudes de Adopción" %>
+
+<div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 w-full">
+  <div class="mb-8">
+    <h1 class="text-2xl sm:text-3xl font-bold text-neutral-800 dark:text-neutral-100">Solicitudes de Adopción</h1>
+    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+      Animales con una solicitud de adopción pendiente de aprobación.
+    </p>
+  </div>
+
+  <% if @reports.any? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @reports.each do |report| %>
+        <% animal = report.animal %>
+        <% adoption_request = report.adoption_requests.max_by(&:created_at) %>
+        <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden flex flex-col">
+          <div class="h-40 bg-neutral-100 dark:bg-neutral-800 flex-shrink-0">
+            <% if report.photo.attached? %>
+              <%= image_tag report.photo.first, class: "w-full h-full object-cover" %>
+            <% end %>
+          </div>
+
+          <div class="p-4 flex flex-col flex-grow">
+            <h3 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 mb-1 capitalize">
+              <%= animal&.species.presence || "Especie desconocida" %>
+            </h3>
+            <p class="text-sm text-neutral-500 mb-4"><%= animal&.race.presence || "Raza sin especificar" %></p>
+
+            <% if adoption_request %>
+              <dl class="text-xs space-y-1.5 mb-4 border-t border-neutral-100 dark:border-neutral-800 pt-3">
+                <div class="flex justify-between gap-2">
+                  <dt class="text-neutral-500">Candidato</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100 font-medium text-right"><%= adoption_request.user.full_name.titleize %></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-neutral-500">Teléfono</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100 font-medium text-right"><%= adoption_request.phone_number %></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-neutral-500">Vivienda</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100 font-medium text-right capitalize"><%= adoption_request.housing_type %><%= " con patio" if adoption_request.has_yard? %></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-neutral-500">Convivientes</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100 font-medium text-right">
+                    <%= adoption_request.household_members_count.presence || "Sin especificar" %><%= ", con niños" if adoption_request.has_children? %>
+                  </dd>
+                </div>
+                <% if adoption_request.other_pets? %>
+                  <div>
+                    <dt class="text-neutral-500">Otros animales</dt>
+                    <dd class="text-neutral-800 dark:text-neutral-100"><%= adoption_request.other_pets_details %></dd>
+                  </div>
+                <% end %>
+                <div>
+                  <dt class="text-neutral-500">Motivación</dt>
+                  <dd class="text-neutral-800 dark:text-neutral-100"><%= adoption_request.motivation %></dd>
+                </div>
+              </dl>
+            <% end %>
+
+            <div class="mt-auto pt-4 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
+              <%= render "shared/components/buttons/button", text: "Ver detalle", href: report_path(report), variant: "secondary", size: "sm", full_width: true %>
+              <div class="flex gap-2">
+                <%= button_to "Rechazar", reject_adoption_report_path(report), method: :patch,
+                    class: "flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-neutral-300 px-3.5 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-800",
+                    data: { turbo_confirm: "¿Rechazar esta solicitud de adopción?" } %>
+                <%= button_to "Aprobar", approve_adoption_report_path(report), method: :patch,
+                    class: "flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-emerald-300/30 bg-emerald-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-emerald-500",
+                    data: { turbo_confirm: "¿Confirmás la adopción?" } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="flex flex-col items-center justify-center py-20 px-4 text-center bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl border border-neutral-100 dark:border-neutral-800">
+      <h2 class="text-xl font-bold text-neutral-800 dark:text-neutral-100 mb-2">No hay solicitudes pendientes</h2>
+      <p class="text-neutral-500 dark:text-neutral-400 max-w-sm">Cuando alguien pida adoptar un animal, la solicitud va a aparecer acá.</p>
+    </div>
+  <% end %>
+</div>

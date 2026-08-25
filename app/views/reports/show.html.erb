@@ -1,0 +1,158 @@
+<% content_for :title, "Detalle del Reporte" %>
+
+<% animal = @report.animal %>
+<% sightings = @report.sightings.order(created_at: :desc).to_a %>
+<% latest_sighting = sightings.first %>
+
+<div class="max-w-5xl mx-auto py-8 px-4 sm:px-6">
+  <div class="mb-6">
+    <%= render "shared/components/buttons/button",
+        text: "Volver a reportes",
+        href: reports_path,
+        variant: "ghost",
+        size: "sm",
+        icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>'
+    %>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
+    <!-- Columna principal: fotos + identificación -->
+    <div class="lg:col-span-3 space-y-6">
+      <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+        <% if @report.photo.attached? %>
+          <% slides = @report.photo.map { |p| { content: image_tag(p, class: "w-full h-80 sm:h-96 object-contain bg-neutral-100 dark:bg-neutral-950") } } %>
+          <%= render "shared/components/carousel/carousel", slides: slides, slide_size: "full", dots: true, buttons: true, show_gradients: false, edge_to_edge: true %>
+        <% else %>
+          <div class="w-full h-80 sm:h-96 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span class="text-sm font-medium">Sin fotos</span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 space-y-5">
+        <div>
+          <h1 class="text-2xl font-bold text-neutral-900 dark:text-white capitalize"><%= animal&.species.presence || "Especie desconocida" %></h1>
+          <p class="text-neutral-500"><%= animal&.race.presence || "Raza sin especificar" %></p>
+        </div>
+
+        <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4 text-sm">
+          <div>
+            <dt class="text-neutral-500 mb-0.5">Tamaño</dt>
+            <dd class="text-neutral-900 dark:text-white font-medium capitalize"><%= animal&.size.presence || "Sin especificar" %></dd>
+          </div>
+          <div>
+            <dt class="text-neutral-500 mb-0.5">Color</dt>
+            <dd class="text-neutral-900 dark:text-white font-medium"><%= animal&.color.presence || "Sin especificar" %></dd>
+          </div>
+          <div>
+            <dt class="text-neutral-500 mb-0.5">Edad aprox.</dt>
+            <dd class="text-neutral-900 dark:text-white font-medium"><%= animal&.age.present? ? "#{animal.age} años" : "Sin especificar" %></dd>
+          </div>
+          <% if animal&.answer_to_name.present? %>
+            <div>
+              <dt class="text-neutral-500 mb-0.5">Responde a</dt>
+              <dd class="text-neutral-900 dark:text-white font-medium capitalize"><%= animal.answer_to_name %></dd>
+            </div>
+          <% end %>
+        </dl>
+
+        <% if animal&.unique_detail.present? %>
+          <div class="pt-4 border-t border-neutral-100 dark:border-neutral-800">
+            <dt class="text-neutral-500 mb-1 text-sm">Rasgos distintivos</dt>
+            <dd class="text-neutral-900 dark:text-white text-sm"><%= animal.unique_detail %></dd>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Columna lateral: estado actual + cronología -->
+    <div class="lg:col-span-2 space-y-6 lg:sticky lg:top-6">
+      <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 space-y-4">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-neutral-500">Estado actual</span>
+            <%= render "shared/components/badge/badge", text: status_label(@report.status), variant: status_badge_variant(@report.status), pill: true %>
+          </div>
+
+          <% if Current.account&.cuidado_animal? && @report.status == "en_proceso_adopcion" %>
+            <div class="flex gap-2">
+              <%= button_to "Rechazar", reject_adoption_report_path(@report), method: :patch,
+                  class: "inline-flex items-center justify-center gap-1.5 rounded-lg border border-neutral-300 px-3.5 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-600",
+                  data: { turbo_confirm: "¿Rechazar esta solicitud de adopción?" } %>
+              <%= button_to "Aprobar adopción", approve_adoption_report_path(@report), method: :patch,
+                  class: "inline-flex items-center justify-center gap-1.5 rounded-lg border border-emerald-300/30 bg-emerald-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600",
+                  data: { turbo_confirm: "¿Confirmás la adopción?" } %>
+            </div>
+          <% elsif !@report.status.in?(%w[adoptado encontrado]) %>
+            <% if @report.user_id == Current.user.id %>
+              <%= button_to "Ya lo encontré", found_report_path(@report), method: :patch,
+                  class: "inline-flex items-center justify-center gap-1.5 rounded-lg border border-emerald-300/30 bg-emerald-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-all duration-100 ease-in-out hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600",
+                  data: { turbo_confirm: "¿Confirmás que ya encontraste a tu mascota?" } %>
+            <% else %>
+              <%= render "reports/help_menu", report: @report, full_width: false %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <% badges = [
+          (["Urgente", "red"] if @report.urgent?),
+          (["Herido", "orange"] if @report.is_hurt?),
+          (["Ansioso", "yellow"] if @report.is_anxious?),
+          (["Comportamiento agresivo", "neutral"] if @report.aggressive?)
+        ].compact %>
+
+        <% if badges.any? %>
+          <div class="flex flex-wrap gap-2">
+            <% badges.each do |label, variant| %>
+              <%= render "shared/components/badge/badge", text: label, variant: variant %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if latest_sighting %>
+          <p class="text-xs text-neutral-500 pt-1">
+            Última actualización: <%= time_ago_in_words(latest_sighting.created_at) %> atrás, por <%= latest_sighting.user.full_name.titleize %>
+          </p>
+        <% end %>
+      </div>
+
+      <!-- Cronología -->
+      <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
+        <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-4">Cronología</h2>
+
+        <ul class="space-y-0">
+          <% sightings.each_with_index do |sighting, index| %>
+            <li class="relative flex gap-3 pb-6 last:pb-0">
+              <% unless index == sightings.size - 1 %>
+                <span class="absolute left-[15px] top-8 bottom-0 w-px bg-neutral-200 dark:bg-neutral-800"></span>
+              <% end %>
+
+              <%= render "shared/components/avatar/avatar",
+                  alt: sighting.user.full_name.titleize,
+                  src: sighting.user.avatar_url,
+                  size: "sm",
+                  classes: "relative z-10 flex-shrink-0" %>
+
+              <div class="min-w-0 pt-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <%= render "shared/components/badge/badge", text: status_label(sighting.status), variant: status_badge_variant(sighting.status), size: "sm", pill: true %>
+                  <span class="text-sm font-medium text-neutral-900 dark:text-white"><%= sighting.user.full_name.titleize %></span>
+                </div>
+                <p class="text-xs text-neutral-500 mt-1">
+                  <%= time_ago_in_words(sighting.created_at) %> atrás
+                </p>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <% if sightings.any? && @report.status.in?(%w[perdido avistado]) %>
+    <%= render "reports/mobility_map", report: @report, sightings: sightings, classes: "mt-6" %>
+  <% end %>
+</div>

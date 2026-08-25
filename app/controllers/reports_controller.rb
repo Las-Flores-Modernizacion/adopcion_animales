@@ -1,127 +1,145 @@
+# app/controllers/reports_controller.rb
 class ReportsController < ApplicationController
-  before_action :set_draft_report, only: %i[answer_photo_permission attach_photo answer_animal_step edit_step]
-  helper_method :calculate_next_step
+  REPORTS_PER_PAGE = 12
 
-  def index
-    @current_tab = params[:tab] || "own"
+  before_action :require_cuidado_animal!, only: [ :adoption_requests, :approve_adoption, :reject_adoption ]
 
-    if @current_tab == "community"
-      @reports = Report.community.order(created_at: :desc)
-    else
-      @reports = Report.own.order(created_at: :desc)
-    end
+  # Solicitudes de adopción pendientes, para el área de Cuidado Animal del municipio.
+  def adoption_requests
+    @reports = Report.published.where(status: "en_proceso_adopcion")
+      .includes(:animal, :location, adoption_requests: { user: :account }).with_attached_photo.order(created_at: :desc)
   end
 
-  def publish
-    @report = Current.user.reports.find(params[:id])
-    if @report.update(draft: false)
-      session[:current_report_id] = nil
-      redirect_to reports_path, notice: "Reporte publicado exitosamente."
-    else
-      redirect_to reports_path, alert: "No se pudo publicar el reporte."
-    end
+  # El admin tiene su propio listado (con todos los reportes, no solo los
+  # propios/de la comunidad) en app/controllers/admin/reports_controller.rb.
+  def index
+    redirect_to admin_reports_path and return if Current.account&.admin?
+
+    @current_tab = params[:tab] || "own"
+
+    @own_page = page_param(params[:own_page])
+    @community_page = page_param(params[:community_page])
+
+    own_reports = Report.own.includes(:animal, :location).with_attached_photo.order(created_at: :desc)
+    community_reports = Report.community.includes(:animal, :location).with_attached_photo.order(created_at: :desc)
+
+    @own_reports_total_pages = total_pages(own_reports.count)
+    @community_reports_total_pages = total_pages(community_reports.count)
+
+    @own_reports = own_reports.limit(REPORTS_PER_PAGE).offset((@own_page - 1) * REPORTS_PER_PAGE)
+    @community_reports = community_reports.limit(REPORTS_PER_PAGE).offset((@community_page - 1) * REPORTS_PER_PAGE)
+  end
+
+  def show
+    @report = Report.published.includes(:animal, :location, sightings: [ { user: :account }, :location ]).find(params[:id])
   end
 
   def new
-    if params[:report_id].present?
-      session[:current_report_id] = params[:report_id]
-      @report = Current.user.reports.find(params[:report_id])
-      @animal = @report.animal || @report.build_animal
-    else
-      session[:current_report_id] = nil
-      @report = Report.new
-    end
+    @report = Report.new
   end
 
   def create
-    @location = Location.new(latitude: params[:browser_lat], longitude: params[:browser_lng])
-    @report = Current.user.reports.new(location: @location)
+    photos = Array(report_step_one_params[:photo]).reject(&:blank?)
 
-    if @location.save && @report.save(validate: false)
-      session[:current_report_id] = @report.id
-      @animal = @report.animal || @report.build_animal
-      respond_to { |format| format.turbo_stream }
+    @report = Report.build_draft(Current.user, location_params, photos)
+    if @report.save
+      redirect_to edit_report_path(@report), notice: "Reporte inicial guardado."
     else
-      render :new, status: :unprocessable_content
+      render :new, status: :unprocessable_entity
     end
   end
 
-  def calculate_next_step
-    animal = @report.animal
-    return "species" if animal.nil? || animal.species.blank?
-    return "race" if animal.race.blank?
-    return "age" if animal.age.blank?
-    return "is_anxious" if animal.is_anxious.nil?
-    return "photo_permission" unless session["photo_permission_#{@report.id}"] || @report.photo.attached?
-    "finish"
+  def edit
+    @report = Current.user.reports.find(params[:id])
+    @report.build_animal unless @report.animal
   end
 
-  def answer_photo_permission
-    @can_photo = params[:can_photo] == "true"
-    @animal = @report.animal || @report.build_animal
+  def update
+    @report = Current.user.reports.find(params[:id])
+    @report.draft = false
 
-    session["photo_permission_#{@report.id}"] = true
+    new_photos = Array(report_params[:photo]).reject(&:blank?)
 
-    respond_to { |format| format.turbo_stream }
-  end
-
-  def attach_photo
-    if params[:report] && params[:report][:photo]
-      @report.photo.attach(params[:report][:photo])
-      @report.save
+    if @report.update(report_params.except(:photo))
+      @report.photo.attach(new_photos) if new_photos.any?
+      @report.record_sighting(
+        user: Current.user, location: @report.location,
+        aggressive: @report.aggressive, is_hurt: @report.is_hurt,
+        is_anxious: @report.is_anxious, urgent: @report.urgent, status: @report.status
+      )
+      redirect_to reports_path, notice: "¡El reporte fue publicado con éxito!"
+    else
+      @report.draft = true
+      render :edit, status: :unprocessable_entity
     end
-
-    @animal = @report.animal || @report.build_animal
-
-    respond_to { |format| format.turbo_stream }
   end
 
-  def answer_animal_step
-    @animal = @report.animal || @report.build_animal
-
-    current_field = params[:current_field]
-    next_field = params[:next_field]
-
-    if current_field.present? && params[:animal].present?
-      @animal.assign_attributes(animal_params(current_field))
-
-      if @animal[current_field].blank? && current_field != "unique_detail"
-        @animal.errors.add(current_field.to_sym, "Este dato no puede estar vacío")
-      end
-
-      @animal.valid?
-
-      if @animal.errors[current_field.to_sym].any?
-        @error_message = @animal.errors[current_field.to_sym].first
-
-        render turbo_stream: turbo_stream.update(
-          "step-animal-#{current_field}-error",
-          "<p class='text-red-500 text-xs font-semibold mt-2 animate-pulse'>#{@error_message}</p>"
-        )
-        return
-      else
-        @animal.save(validate: false)
-      end
-    end
-
-    @next_step = next_field
-    respond_to { |format| format.turbo_stream }
+  def destroy
+    @report = Current.user.reports.find(params[:id])
+    @report.destroy
+    redirect_to reports_path, notice: "Reporte eliminado."
   end
 
-  def edit_step
-    @step = params[:step]
-    @animal = @report.animal
-    respond_to { |format| format.turbo_stream }
+  # El dueño original del reporte marca que ya encontró a su mascota.
+  def found
+    @report = Current.user.reports.find(params[:id])
+    @report.record_sighting(
+      user: Current.user, location: @report.location,
+      aggressive: false, is_hurt: false, is_anxious: false, urgent: false, status: "encontrado"
+    )
+    redirect_to report_path(@report), notice: "¡Qué alegría! Marcamos el reporte como encontrado."
+  end
+
+  # El área de Cuidado Animal aprueba una solicitud de adopción pendiente.
+  def approve_adoption
+    @report = Report.published.where(status: "en_proceso_adopcion").find(params[:id])
+    @report.record_sighting(
+      user: Current.user, location: @report.location,
+      aggressive: false, is_hurt: false, is_anxious: false, urgent: false, status: "adoptado"
+    )
+    redirect_to report_path(@report), notice: "Adopción aprobada."
+  end
+
+  # El área de Cuidado Animal rechaza una solicitud (vuelve a tránsito).
+  def reject_adoption
+    @report = Report.published.where(status: "en_proceso_adopcion").find(params[:id])
+    @report.record_sighting(
+      user: Current.user, location: @report.location,
+      aggressive: false, is_hurt: false, is_anxious: false, urgent: false, status: "en_transito"
+    )
+    redirect_to report_path(@report), notice: "Solicitud de adopción rechazada."
   end
 
   private
 
-  def set_draft_report
-    @report = Current.user.reports.find_by(id: session[:current_report_id])
-    redirect_to new_report_path, alert: "Sesión expirada o reporte no encontrado." unless @report
+  def require_cuidado_animal!
+    head :forbidden unless Current.account&.cuidado_animal?
   end
 
-  def animal_params(field)
-    params.require(:animal).permit(field.to_sym)
+  def page_param(value)
+    page = value.to_i
+    page < 1 ? 1 : page
+  end
+
+  def total_pages(count)
+    (count / REPORTS_PER_PAGE.to_f).ceil
+  end
+
+  def location_params
+    params.require(:location).permit(:browser_lat, :browser_lng)
+  end
+
+  def report_step_one_params
+    params.require(:report).permit(photo: [])
+  end
+
+  def report_params
+    params.require(:report).permit(
+      :aggressive, :is_hurt, :is_anxious, :urgent,
+      photo: [],
+      animal_attributes: [
+        :id, :species, :size, :color, :race, :age, :answer_to_name, :unique_detail
+      ]
+    )
   end
 end

@@ -1,0 +1,99 @@
+<% content_for :title, "Panel de Administración" %>
+
+<div class="max-w-6xl mx-auto py-8 px-4 sm:px-6">
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-neutral-800 dark:text-neutral-100">Métricas</h1>
+    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Estado general del sistema de reportes.</p>
+  </div>
+
+  <%= render "admin/subnav", current: "metricas" %>
+
+  <!-- Totales -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <p class="text-xs font-medium text-neutral-500 mb-1">Reportes totales</p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white"><%= @metrics.total_reports %></p>
+    </div>
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <p class="text-xs font-medium text-neutral-500 mb-1">Usuarios totales</p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white"><%= @metrics.total_users %></p>
+    </div>
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <p class="text-xs font-medium text-neutral-500 mb-1">Tasa de resolución</p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white"><%= @metrics.resolution_rate %>%</p>
+      <p class="text-[11px] text-neutral-400 mt-0.5">Encontrados + adoptados</p>
+    </div>
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <p class="text-xs font-medium text-neutral-500 mb-1">Reportes (últimos 7 días)</p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white"><%= @metrics.reports_created_since(7) %></p>
+      <p class="text-[11px] text-neutral-400 mt-0.5"><%= @metrics.reports_created_since(30) %> en los últimos 30 días</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+    <!-- Estados -->
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-4">Reportes por estado</h2>
+      <%= render "shared/components/horizontal_bars/horizontal_bars",
+          items: @metrics.status_counts.map { |status, count| { label: status_label(status), value: count, hex: status_map_color(status) } } %>
+    </div>
+
+    <!-- Actividad reciente -->
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-4">Actividad reciente</h2>
+      <dl class="space-y-3 text-sm">
+        <div class="flex items-center justify-between">
+          <dt class="text-neutral-500">Reportes nuevos (7 días)</dt>
+          <dd class="font-semibold text-neutral-800 dark:text-neutral-100"><%= @metrics.reports_created_since(7) %></dd>
+        </div>
+        <div class="flex items-center justify-between">
+          <dt class="text-neutral-500">Reportes nuevos (30 días)</dt>
+          <dd class="font-semibold text-neutral-800 dark:text-neutral-100"><%= @metrics.reports_created_since(30) %></dd>
+        </div>
+        <div class="flex items-center justify-between">
+          <dt class="text-neutral-500">Avistamientos/novedades (7 días)</dt>
+          <dd class="font-semibold text-neutral-800 dark:text-neutral-100"><%= @metrics.sightings_created_since(7) %></dd>
+        </div>
+        <div class="flex items-center justify-between">
+          <dt class="text-neutral-500">Avistamientos/novedades (30 días)</dt>
+          <dd class="font-semibold text-neutral-800 dark:text-neutral-100"><%= @metrics.sightings_created_since(30) %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <!-- Perfil de animales -->
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-4">Perfil de animales reportados</h2>
+
+      <p class="text-xs font-medium text-neutral-500 mb-2">Especie</p>
+      <div class="mb-5">
+        <%= render "shared/components/horizontal_bars/horizontal_bars",
+            items: @metrics.species_counts.map { |species, count| { label: species, value: count } },
+            color: "bg-blue-500" %>
+      </div>
+
+      <p class="text-xs font-medium text-neutral-500 mb-2">Tamaño</p>
+      <%= render "shared/components/horizontal_bars/horizontal_bars",
+          items: @metrics.size_counts.map { |size, count| { label: size, value: count } },
+          color: "bg-purple-500" %>
+    </div>
+
+    <!-- Solicitudes de adopción -->
+    <% adoption_stats = @metrics.adoption_stats %>
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-1">Solicitudes de adopción</h2>
+      <p class="text-xs text-neutral-500 mb-4">
+        <%= adoption_stats[:total] %> solicitudes totales. Aprobadas/rechazadas se calculan según el estado
+        actual del reporte, no queda un historial de solicitudes rechazadas.
+      </p>
+      <%= render "shared/components/horizontal_bars/horizontal_bars",
+          items: [
+            { label: "Pendientes de revisión", value: adoption_stats[:pending], hex: status_map_color("en_proceso_adopcion") },
+            { label: "Aprobadas", value: adoption_stats[:approved], hex: status_map_color("adoptado") },
+            { label: "Rechazadas", value: adoption_stats[:rejected], hex: status_map_color("en_transito") }
+          ] %>
+    </div>
+  </div>
+</div>

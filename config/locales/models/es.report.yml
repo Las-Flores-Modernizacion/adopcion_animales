@@ -1,0 +1,9 @@
+es:
+  activerecord:
+    models:
+      report:
+        one: "reporte"
+        other: "reportes"
+    attributes:
+      report:
+        photo: "fotografía"

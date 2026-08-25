@@ -1,0 +1,47 @@
+<% content_for :title, "Usuarios" %>
+
+<div class="max-w-6xl mx-auto py-8 px-4 sm:px-6">
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-neutral-800 dark:text-neutral-100">Usuarios</h1>
+    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Todas las cuentas registradas en el sistema.</p>
+  </div>
+
+  <%= render "admin/subnav", current: "usuarios" %>
+
+  <%
+    rows = @accounts.map do |account|
+      user_cell = capture do
+        concat content_tag(:div, class: "flex items-center gap-2.5") {
+          render("shared/components/avatar/avatar", alt: account.full_name.titleize, src: account.avatar_url, size: "sm") +
+            content_tag(:span, account.full_name.titleize, class: "font-medium text-neutral-800 dark:text-neutral-100") +
+            (account == Current.account ? render("shared/components/badge/badge", text: "Vos", variant: "neutral", size: "sm", pill: true) : "".html_safe)
+        }
+      end
+
+      role_cell = capture do
+        if account == Current.account
+          render "shared/components/badge/badge", text: account.role.titleize, variant: "neutral", pill: true
+        else
+          render "shared/components/forms/inline_role_form", account: account
+        end
+      end
+
+      {
+        cells: [
+          { content: user_cell },
+          { content: account.email_address },
+          { content: account.phone_number.presence || "—" },
+          { content: account.user.reports.size.to_s },
+          { content: role_cell, classes: "w-48" }
+        ]
+      }
+    end
+  %>
+
+  <%= render "shared/components/table/table",
+      columns: [
+        { label: "Usuario" }, { label: "Email" }, { label: "Teléfono" }, { label: "Reportes" }, { label: "Rol" }
+      ],
+      rows: rows,
+      hoverable: true %>
+</div>

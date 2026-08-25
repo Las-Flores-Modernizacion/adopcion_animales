@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_08_173235) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_24_145828) do
   create_table "accounts", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest"
@@ -23,6 +23,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_173235) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "avatar_url"
+    t.string "phone_number"
+    t.integer "role", default: 0, null: false
     t.index ["email_address"], name: "index_accounts_on_email_address", unique: true
     t.index ["user_id"], name: "index_accounts_on_user_id"
   end
@@ -55,22 +58,36 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_173235) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "adoption_requests", force: :cascade do |t|
+    t.integer "report_id", null: false
+    t.integer "user_id", null: false
+    t.string "phone_number"
+    t.string "housing_type"
+    t.boolean "has_yard"
+    t.boolean "other_pets"
+    t.text "other_pets_details"
+    t.boolean "has_experience"
+    t.text "motivation"
+    t.integer "household_members_count"
+    t.boolean "has_children"
+    t.string "daily_availability"
+    t.boolean "household_allergies"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["report_id"], name: "index_adoption_requests_on_report_id"
+    t.index ["user_id"], name: "index_adoption_requests_on_user_id"
+  end
+
   create_table "animals", force: :cascade do |t|
     t.string "color"
     t.integer "size"
-    t.boolean "aggressive"
     t.string "unique_detail"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "is_hurt"
-    t.boolean "urgent"
     t.string "answer_to_name"
     t.integer "species"
-    t.boolean "is_anxious"
     t.integer "age"
     t.string "race"
-    t.integer "report_id", null: false
-    t.index ["report_id"], name: "index_animals_on_report_id"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -87,6 +104,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_173235) do
     t.integer "user_id", null: false
     t.integer "location_id", null: false
     t.boolean "draft", default: true
+    t.integer "animal_id"
+    t.boolean "aggressive"
+    t.boolean "is_hurt"
+    t.boolean "is_anxious"
+    t.boolean "urgent"
+    t.integer "status", default: 0, null: false
+    t.index ["animal_id"], name: "index_reports_on_animal_id", unique: true
     t.index ["location_id"], name: "index_reports_on_location_id"
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
@@ -100,6 +124,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_173235) do
     t.index ["account_id"], name: "index_sessions_on_account_id"
   end
 
+  create_table "sightings", force: :cascade do |t|
+    t.integer "report_id", null: false
+    t.integer "user_id", null: false
+    t.integer "location_id", null: false
+    t.boolean "aggressive"
+    t.boolean "is_hurt"
+    t.boolean "is_anxious"
+    t.boolean "urgent"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_sightings_on_location_id"
+    t.index ["report_id"], name: "index_sightings_on_report_id"
+    t.index ["user_id"], name: "index_sightings_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -108,8 +148,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_173235) do
   add_foreign_key "accounts", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "animals", "reports"
+  add_foreign_key "adoption_requests", "reports"
+  add_foreign_key "adoption_requests", "users"
+  add_foreign_key "reports", "animals"
   add_foreign_key "reports", "locations"
   add_foreign_key "reports", "users"
   add_foreign_key "sessions", "accounts"
+  add_foreign_key "sightings", "locations"
+  add_foreign_key "sightings", "reports"
+  add_foreign_key "sightings", "users"
 end

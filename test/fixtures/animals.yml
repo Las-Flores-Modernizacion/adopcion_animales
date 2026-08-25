@@ -3,26 +3,17 @@
 tito:
   color: blanco
   size: :pequeño
-  aggressive: false
   unique_detail: rengo
-  is_hurt: false
-  urgent: false
   answer_to_name: tito
   species: :perro
   race: caniche
-  is_anxious: false
   age: 5
-
 
 tasha:
   color: gris
   size: :pequeño
-  aggressive: false
   unique_detail: ciego de un ojo
-  is_hurt: false
-  urgent: false
   answer_to_name: tasha
   species: :perro
   race: caniche
-  is_anxious: false
   age: 11

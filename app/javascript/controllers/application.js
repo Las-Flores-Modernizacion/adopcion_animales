@@ -1,4 +1,7 @@
 import { Application } from "@hotwired/stimulus"
+import * as ActiveStorage from "@rails/activestorage"
+
+ActiveStorage.start()
 
 const application = Application.start()
 

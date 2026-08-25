@@ -1,0 +1,118 @@
+<% content_for :title, "Dar Tránsito" %>
+
+<div class="max-w-2xl mx-auto py-8 px-4 sm:px-6">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Dar Tránsito</h1>
+    <p class="text-neutral-500 mt-2">
+      Vas a alojar a este animal temporalmente en tu hogar mientras se busca un adoptante. Dejanos la
+      ubicación y un teléfono de contacto para que puedan coordinar con vos.
+    </p>
+  </div>
+
+  <div class="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm mb-6 flex items-center gap-4">
+    <% if @report.photo.attached? %>
+      <%= image_tag @report.photo.first, class: "size-16 rounded-xl object-cover flex-shrink-0" %>
+    <% end %>
+    <div class="min-w-0">
+      <p class="font-semibold text-neutral-900 dark:text-white capitalize truncate"><%= @report.animal&.species %></p>
+      <p class="text-sm text-neutral-500 truncate"><%= @report.animal&.race.presence || "Raza sin especificar" %></p>
+    </div>
+  </div>
+
+  <% if @error.present? %>
+    <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800 mb-6">
+      <p class="text-sm font-medium text-red-800 dark:text-red-400"><%= @error %></p>
+    </div>
+  <% end %>
+
+  <%= form_with(
+    url: report_fosterings_path(@report),
+    class: "space-y-6",
+    data: { controller: "gps" }
+  ) do |form| %>
+
+    <!-- Coordenadas ocultas: dónde vas a alojar al animal -->
+    <%= hidden_field_tag "location[browser_lat]", nil, data: { gps_target: "lat" } %>
+    <%= hidden_field_tag "location[browser_lng]", nil, data: { gps_target: "lng" } %>
+
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Datos de contacto</h3>
+      <p class="text-xs text-neutral-500 -mt-3">Esta ubicación queda visible para que otros puedan llegar hasta ahí, pero no se usa para estimar dónde está el animal en la calle.</p>
+
+      <%= render "shared/components/forms/form_group",
+          label: "Teléfono de contacto",
+          name: "sighting[phone_number]",
+          required: true,
+          helper_text: "Se guarda en tu perfil para que puedan contactarte por este caso." do %>
+        <%= text_field_tag "sighting[phone_number]", Current.account.phone_number, class: "form-control", required: true %>
+      <% end %>
+    </div>
+
+    <!-- Estado y comportamiento (opcional) -->
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+      <div>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Estado y Comportamiento</h3>
+        <p class="text-xs text-neutral-500 mt-1">Opcional: actualizá esto si algo cambió desde el último registro.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <%= hidden_field_tag "sighting[urgent]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Caso Urgente", description: "Requiere asistencia inmediata",
+            name: "sighting[urgent]", value: "1", checked: @report.urgent?,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+        <%= hidden_field_tag "sighting[is_hurt]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Está herido", description: "Presenta lesiones visibles",
+            name: "sighting[is_hurt]", value: "1", checked: @report.is_hurt?,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+        <%= hidden_field_tag "sighting[aggressive]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Comportamiento agresivo", description: "Precaución al acercarse",
+            name: "sighting[aggressive]", value: "1", checked: @report.aggressive?,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+        <%= hidden_field_tag "sighting[is_anxious]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Asustado o ansioso", description: "Tiembla o se esconde",
+            name: "sighting[is_anxious]", value: "1", checked: @report.is_anxious?,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+      </div>
+    </div>
+
+    <!-- Estado GPS -->
+    <div data-gps-target="warning" class="p-4 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div data-gps-target="message" class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div class="text-sm">
+          <strong class="font-semibold block sm:inline">Sin ubicación GPS:</strong> Se requiere obtener la ubicación donde vas a alojar al animal.
+        </div>
+      </div>
+
+      <%= render "shared/components/buttons/button",
+          text: "Obtener ubicación GPS",
+          type: "button",
+          variant: "warning",
+          style: "fancy",
+          size: "sm",
+          data: { "gps-target": "retry", action: "click->gps#checkLocation" }
+      %>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-2">
+      <%= render "shared/components/buttons/button",
+          text: "Confirmar tránsito",
+          type: "submit",
+          style: "fancy",
+          variant: "primary",
+          disabled: true,
+          data: { "gps-target": "submit", "turbo-submits-with": "Guardando..." },
+          classes: "pointer-events-none"
+      %>
+    </div>
+  <% end %>
+</div>

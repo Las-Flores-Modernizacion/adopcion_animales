@@ -1,0 +1,51 @@
+<% content_for :title, "Reportes" %>
+
+<div class="max-w-6xl mx-auto py-8 px-4 sm:px-6">
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-neutral-800 dark:text-neutral-100">Reportes</h1>
+    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Todos los reportes publicados en el sistema.</p>
+  </div>
+
+  <%= render "admin/subnav", current: "reportes" %>
+
+  <% if @reports.any? %>
+    <%
+      rows = @reports.map do |report|
+        animal_cell = capture do
+          content_tag(:p, report.animal&.species.presence || "Especie desconocida", class: "font-medium text-neutral-800 dark:text-neutral-100 capitalize") +
+            content_tag(:p, report.animal&.race.presence || "Raza sin especificar", class: "text-xs text-neutral-500")
+        end
+
+        status_cell = capture { render "shared/components/badge/badge", text: status_label(report.status), variant: status_badge_variant(report.status), size: "sm", pill: true }
+
+        link_cell = capture { render "shared/components/buttons/button", text: "Ver detalle", href: admin_report_path(report), variant: "ghost", size: "sm" }
+
+        {
+          cells: [
+            { content: animal_cell },
+            { content: report.user.full_name.titleize },
+            { content: status_cell },
+            { content: report.created_at.strftime("%d/%m/%Y") },
+            { content: link_cell, align: "right" }
+          ]
+        }
+      end
+    %>
+
+    <%= render "shared/components/table/table",
+        columns: [
+          { label: "Animal" }, { label: "Reportante" }, { label: "Estado" }, { label: "Creado" }, { label: "", align: "right" }
+        ],
+        rows: rows,
+        hoverable: true %>
+
+    <%= render "shared/components/pagination/pagination",
+        current_page: @page,
+        total_pages: @total_pages,
+        page_param: :page %>
+  <% else %>
+    <div class="flex flex-col items-center justify-center py-20 px-4 text-center bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl border border-neutral-100 dark:border-neutral-800">
+      <h2 class="text-xl font-bold text-neutral-800 dark:text-neutral-100 mb-2">Todavía no hay reportes</h2>
+    </div>
+  <% end %>
+</div>

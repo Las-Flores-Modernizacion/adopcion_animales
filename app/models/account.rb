@@ -1,5 +1,11 @@
 class Account < ApplicationRecord
-  has_secure_password validations: :false
+  has_secure_password validations: false
+
+  # cuidado_animal: personal del área de Cuidado Animal del municipio, único
+  # rol habilitado para aprobar o rechazar solicitudes de adopción. admin:
+  # acceso al panel de administración (usuarios, reportes, mapa, métricas) y
+  # único rol que puede asignar roles a otras cuentas desde la propia app.
+  enum :role, { vecino: 0, cuidado_animal: 1, admin: 2 }
 
   belongs_to :user, dependent: :destroy
   has_many :sessions, dependent: :destroy
@@ -28,6 +34,7 @@ class Account < ApplicationRecord
         uid: auth.uid,
         oauth_token: auth.credentials.token,
         oauth_expires_at: parse_oauth_expiration(auth),
+        avatar_url: auth.info.image,
         password: SecureRandom.hex(32)
       )
       account.save
@@ -36,12 +43,14 @@ class Account < ApplicationRecord
         provider: auth.provider.downcase,
         uid: auth.uid,
         oauth_token: auth.credentials.token,
-        oauth_expires_at: parse_oauth_expiration(auth)
+        oauth_expires_at: parse_oauth_expiration(auth),
+        avatar_url: auth.info.image
       )
     else
       account.update(
         oauth_token: auth.credentials.token,
-        oauth_expires_at: parse_oauth_expiration(auth)
+        oauth_expires_at: parse_oauth_expiration(auth),
+        avatar_url: auth.info.image
       )
     end
 

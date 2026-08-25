@@ -11,15 +11,36 @@ Rails.application.routes.draw do
   end
   delete "/logout", to: "sessions#destroy"
 
+  # Atajo de login solo para development: entrar como cualquier email
+  # visitando /dev_login/:email (se crea la cuenta si no existe), sin pasar
+  # por Google OAuth ya que no hay credenciales reales configuradas en local.
+  # Nunca se monta fuera de development (ver DevLoginController para el
+  # resguardo extra).
+  if Rails.env.development?
+    get "/dev_login/:email", to: "dev_login#show", constraints: { email: /[^\/]+/ }, as: :dev_login
+  end
+
   resources :reports, path: "reportes" do
+    resources :sightings, only: [ :new, :create ], path: "avistamientos"
+    resources :fosterings, only: [ :new, :create ], path: "transito"
+    resources :adoptions, only: [ :new, :create ], path: "adopcion"
     member do
-      patch :publish
+      patch :found, path: "encontrado"
+      patch :approve_adoption, path: "aprobar-adopcion"
+      patch :reject_adoption, path: "rechazar-adopcion"
     end
     collection do
-      post :answer_photo_permission
-      post :attach_photo
-      post :answer_animal_step
-      get :edit_step
+      get :adoption_requests, path: "solicitudes-adopcion"
+    end
+  end
+  resources :animals, only: [ :index ], path: "animales"
+  resource :profile, only: [ :edit, :update ], path: "perfil"
+
+  namespace :admin do
+    root to: "dashboard#index"
+    resources :users, only: [ :index, :update ]
+    resources :reports, only: [ :index, :show ] do
+      collection { get :map }
     end
   end
 

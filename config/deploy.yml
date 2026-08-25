@@ -47,6 +47,11 @@ env:
     SOLID_QUEUE_IN_PUMA: true
     APP_HOST: mascotas.lasflores.net.ar
 
+    # Puma's default of 3 threads (single worker) was too low: bursts of
+    # concurrent requests exhausted the pool while Solid Queue's supervisor
+    # competed for the same threads, causing kamal-proxy to return 503 on
+    # /auth/google under normal traffic.
+    RAILS_MAX_THREADS: 5
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3

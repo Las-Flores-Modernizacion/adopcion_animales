@@ -1,0 +1,10 @@
+<% content_for :title, "Editar Reporte" %>
+
+<div class="max-w-3xl mx-auto py-8 px-4 sm:px-6">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Detalles del Animal</h1>
+    <p class="text-neutral-500 mt-2">Completa la información sobre el animal reportado.</p>
+  </div>
+
+  <%= render "form", report: @report %>
+</div>

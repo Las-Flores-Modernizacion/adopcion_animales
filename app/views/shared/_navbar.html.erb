@@ -1,37 +1,138 @@
-<nav class="w-full bg-white border-b border-gray-300" data-controller="navbar">
-  <div class="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
-    <div class="flex items-center justify-between w-full sm:w-auto">
-      <div class="flex items-center space-x-3 flex-shrink-0">
-        <%= image_tag "logo_gobierno_municipal.png", alt: "Logo", class: "h-10 w-auto" %>
-        <h1 class="text-lg font-bold text-gray-800 hidden sm:block">Adopción</h1>
-      </div>
+<nav class="w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-neutral-800 sticky top-0 z-50">
+  <div class="container mx-auto px-4 h-16 flex items-center justify-between">
 
-      <button class="sm:hidden p-2 text-gray-600 cursor-pointer" data-action="click->navbar#toggle">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-      </button>
+    <%# Logo y Navegación Principal %>
+    <div class="flex items-center gap-8">
+      <a href="<%= Current.account&.admin? ? admin_root_path : "/reportes" %>" class="flex items-center space-x-3 flex-shrink-0 transition-opacity hover:opacity-80 rounded-md focus-visible:outline-2 focus-visible:outline-blue-600">
+        <%= image_tag "logo_gobierno_municipal.png", alt: "Logo Municipio", class: "h-10 w-auto dark:hidden" %>
+        <%= image_tag "logo_gobierno_municipal_light.png", alt: "Logo Municipio", class: "h-10 w-auto hidden dark:block" %>
+        <h1 class="text-lg font-bold text-gray-900 dark:text-neutral-100 hidden sm:block">Mascotas</h1>
+      </a>
     </div>
 
-    <div class="hidden sm:flex sm:justify-between items-center gap-2 pb-1 sm:pb-0 w-full sm:w-auto flex-col sm:flex-row bg-white p-4 sm:p-0" data-navbar-target="menu">
-      <!--
-      <%# <%= link_to "", _path, class: "flex items-center justify-center gap-1.5 rounded-lg border border-neutral-400/30 text-neutral-800 hover:bg-neutral-100 px-3.5 py-2 mb-2 sm:mb-0 text-sm font-medium whitespace-nowrap shadow-sm transition-all duration-100 ease-in-out select-none disabled:opacity-50 w-full sm:w-auto" %> %>
-      -->
-
+    <%# LADO DERECHO: Perfil de Usuario con Desplegable %>
+    <div class="flex items-center gap-4">
       <% if authenticated? %>
-        <%= link_to "Reportes", reports_path, class: "flex items-center justify-center gap-1.5 rounded-lg border border-neutral-400/30 text-neutral-800 hover:bg-neutral-100 px-3.5 py-2 mb-2 sm:mb-0 text-sm font-medium whitespace-nowrap shadow-sm transition-all duration-100 ease-in-out select-none disabled:opacity-50 w-full sm:w-auto" %>
+        <div class="relative" 
+             data-controller="dropdown"
+             data-action="click@window->dropdown#hideOnClickOutside">
 
-        <%= button_to logout_path, method: :delete, class: "group flex items-center justify-center rounded-lg border border-red-200 bg-red-600 px-3 py-2 mb-2 sm:mb-0 text-sm font-medium text-white shadow-sm transition-all hover:bg-red-400 hover:text-white-900 cursor-pointer w-full sm:w-auto" do %>
-          <span>Cerrar sesión</span>
-        <% end %>
-      <% end %>
+          <%# Botón Avatar Pill %>
+          <button type="button"
+                  class="flex items-center gap-2.5 p-1 sm:pr-3 rounded-full bg-white dark:bg-neutral-800 shadow-sm ring-1 ring-neutral-900/5 dark:ring-white/10 hover:shadow-md hover:ring-neutral-900/10 dark:hover:ring-white/20 transition-all duration-300 select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  data-action="click->dropdown#toggle"
+                  data-dropdown-target="button"
+                  aria-expanded="false"
+                  aria-haspopup="true">
 
-      <% if !authenticated? %>
-        <%= button_to "/auth/google",
-          method: :post,
-          data: { turbo: false },
-          params: { authenticity_token: form_authenticity_token },
-          class: "flex items-center justify-center gap-1.5 rounded-lg border border-black/10 bg-white/90 px-3.5 py-2 text-sm font-medium whitespace-nowrap text-neutral-800 shadow-xs transition-all duration-100 ease-in-out select-none hover:bg-neutral-50 cursor-pointer disabled:opacity-50 w-full sm:w-auto" do %>
-          <span>Iniciar sesión</span>
-        <% end %>
+            <%= render "shared/components/avatar/avatar",
+              alt: Current.user.full_name.titleize,
+              src: Current.user.avatar_url,
+              size: "sm",
+              status: "online"
+            %>
+
+            <span class="hidden sm:block text-sm font-semibold text-neutral-700 dark:text-neutral-200 truncate max-w-[150px]">
+              <%= Current.user.full_name.titleize %>
+            </span>
+            <svg class="hidden sm:block w-4 h-4 text-neutral-400 dark:text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <%# Menú Desplegable con Estilado Fancy %>
+          <div class="hidden opacity-0 -translate-y-2 absolute right-0 top-full mt-2.5 w-56 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-2xl p-2 shadow-2xl shadow-neutral-900/10 dark:shadow-neutral-950/50 ring-1 ring-neutral-900/10 dark:ring-white/10 border border-neutral-100 dark:border-neutral-800 z-50 transition-all duration-200 ease-out space-y-1.5"
+               data-dropdown-target="menu">
+
+            <%# Selector Modo Oscuro dentro del Menú %>
+            <div class="px-1 py-1.5 border-b border-neutral-100 dark:border-neutral-800 flex justify-center">
+              <%= render "shared/components/dark_mode_switcher/dark_mode_switcher", variant: "segmented", classes: "w-full flex justify-center" %>
+            </div>
+
+            <% unless Current.account&.admin? %>
+              <div>
+                <%= render "shared/components/buttons/button",
+                  text: "Reportes",
+                  href: reports_path,
+                  variant: "secondary",
+                  style: "fancy",
+                  size: "sm",
+                  full_width: true,
+                  classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
+                %>
+              </div>
+            <% end %>
+
+            <% if Current.account&.cuidado_animal? %>
+              <div>
+                <%= render "shared/components/buttons/button",
+                  text: "Solicitudes de adopción",
+                  href: adoption_requests_reports_path,
+                  variant: "secondary",
+                  style: "fancy",
+                  size: "sm",
+                  full_width: true,
+                  classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
+                %>
+              </div>
+            <% end %>
+
+            <% if Current.account&.admin? %>
+              <div>
+                <%= render "shared/components/buttons/button",
+                  text: "Panel de administración",
+                  href: admin_root_path,
+                  variant: "secondary",
+                  style: "fancy",
+                  size: "sm",
+                  full_width: true,
+                  classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
+                %>
+              </div>
+            <% end %>
+
+            <div>
+              <%= render "shared/components/buttons/button",
+                text: "Mi perfil",
+                href: edit_profile_path,
+                variant: "secondary",
+                style: "fancy",
+                size: "sm",
+                full_width: true,
+                classes: "!justify-start text-neutral-800 dark:text-neutral-200 font-medium"
+              %>
+            </div>
+
+            <%# Opción Cerrar Sesión (Mobile y Desktop) %>
+            <div>
+              <%= render "shared/components/buttons/button",
+                text: "Cerrar sesión",
+                href: logout_path,
+                variant: "destructive",
+                style: "fancy",
+                size: "sm",
+                full_width: true,
+                classes: "!justify-start font-medium",
+                data: { "turbo-method": :delete }
+              %>
+            </div>
+
+          </div>
+        </div>
+      <% else %>
+        <div class="flex items-center gap-3">
+          <%= render "shared/components/dark_mode_switcher/dark_mode_switcher", variant: "cycle_icon" %>
+
+          <%= form_with url: "/auth/google", method: :post, data: { turbo: false } do %>
+            <%= render "shared/components/buttons/button",
+              text: "Iniciar sesión",
+              type: "submit",
+              variant: "primary",
+              style: "fancy",
+              classes: "cursor-pointer"
+            %>
+          <% end %>
+        </div>
       <% end %>
     </div>
   </div>

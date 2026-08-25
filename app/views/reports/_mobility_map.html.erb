@@ -1,0 +1,39 @@
+<%#
+  Mobility Map
+  Mapa de avistamientos de un reporte: un marcador por avistamiento, unidos
+  por una línea cronológica, más el círculo de "zona probable" que estima
+  MobilityEstimator (ver app/models/mobility_estimator.rb y map_controller.js).
+
+  Required locals:
+    - report: Report
+    - sightings: Array<Sighting> - ya ordenados de más nuevo a más viejo
+      (mismo orden que usa la Cronología, para no repetir la query acá)
+
+  Optional locals:
+    - classes: String (default: nil) - clases extra para el wrapper
+%>
+
+<% classes = local_assigns.fetch(:classes, nil) %>
+<% zone = report.probable_zone %>
+<% markers = sightings.reverse.map { |s| { lat: s.location.latitude.to_f, lng: s.location.longitude.to_f, label: status_label(s.status), date: s.created_at.strftime("%d/%m/%Y %H:%M") } } %>
+
+<div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 <%= classes %>">
+  <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-1">Mapa de avistamientos</h2>
+  <p class="text-xs text-neutral-500 mb-4">
+    <% if zone %>
+      Círculo azul: zona probable actual, radio estimado de ~<%= number_with_precision(zone[:radius_km], precision: 1) %> km según los avistamientos y la movilidad esperada del animal. Es una estimación, no una garantía.
+    <% else %>
+      Ubicaciones de los avistamientos registrados.
+    <% end %>
+  </p>
+
+  <div
+    class="w-full h-80 sm:h-96 rounded-xl overflow-hidden z-0"
+    data-controller="map"
+    data-map-markers-value="<%= markers.to_json %>"
+    <% if zone %>
+      data-map-center-value="<%= { lat: zone[:center][:latitude], lng: zone[:center][:longitude] }.to_json %>"
+      data-map-radius-km-value="<%= zone[:radius_km] %>"
+    <% end %>
+  ></div>
+</div>

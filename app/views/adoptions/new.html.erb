@@ -1,0 +1,127 @@
+<% content_for :title, "Solicitar Adopción" %>
+
+<div class="max-w-2xl mx-auto py-8 px-4 sm:px-6">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Solicitar Adopción</h1>
+    <p class="text-neutral-500 mt-2">
+      Contanos sobre vos y tu hogar para que el área de Cuidado Animal del municipio pueda evaluar tu
+      solicitud. Se van a contactar para coordinar los siguientes pasos.
+    </p>
+  </div>
+
+  <div class="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm mb-6 flex items-center gap-4">
+    <% if @report.photo.attached? %>
+      <%= image_tag @report.photo.first, class: "size-16 rounded-xl object-cover flex-shrink-0" %>
+    <% end %>
+    <div class="min-w-0">
+      <p class="font-semibold text-neutral-900 dark:text-white capitalize truncate"><%= @report.animal&.species %></p>
+      <p class="text-sm text-neutral-500 truncate"><%= @report.animal&.race.presence || "Raza sin especificar" %></p>
+    </div>
+  </div>
+
+  <% if @adoption_request.errors.any? %>
+    <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800 mb-6">
+      <h3 class="text-sm font-medium text-red-800 dark:text-red-400">Por favor revisá los siguientes errores:</h3>
+      <ul class="list-disc list-inside text-sm text-red-700 dark:text-red-400 mt-1">
+        <% @adoption_request.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @adoption_request, url: report_adoptions_path(@report), class: "space-y-6" do |form| %>
+
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Datos de contacto</h3>
+
+      <%= render "shared/components/forms/form_group",
+          label: "Teléfono de contacto", name: "adoption_request[phone_number]", required: true,
+          error: @adoption_request.errors[:phone_number].first do %>
+        <%= form.text_field :phone_number, class: "form-control", required: true %>
+      <% end %>
+    </div>
+
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Tu hogar</h3>
+
+      <%= render "shared/components/select/select",
+          name: "adoption_request[housing_type]",
+          label: "Tipo de vivienda",
+          required: true,
+          options: [ [ "Casa", "casa" ], [ "Departamento", "departamento" ] ],
+          selected: @adoption_request.housing_type,
+          placeholder: "Elegí una opción",
+          error: @adoption_request.errors[:housing_type].first %>
+
+      <%= render "shared/components/forms/form_group",
+          label: "Cantidad de convivientes", name: "adoption_request[household_members_count]",
+          error: @adoption_request.errors[:household_members_count].first do %>
+        <%= form.number_field :household_members_count, class: "form-control", min: 1 %>
+      <% end %>
+
+      <%= render "shared/components/forms/form_group",
+          label: "Disponibilidad de tiempo diario", name: "adoption_request[daily_availability]",
+          helper_text: "Ej: todo el día, solo tardes, fines de semana." do %>
+        <%= form.text_field :daily_availability, class: "form-control" %>
+      <% end %>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <%= hidden_field_tag "adoption_request[has_yard]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Tiene patio o espacio exterior", name: "adoption_request[has_yard]", value: "1",
+            checked: @adoption_request.has_yard,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+        <%= hidden_field_tag "adoption_request[has_children]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Hay niños en el hogar", name: "adoption_request[has_children]", value: "1",
+            checked: @adoption_request.has_children,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+        <%= hidden_field_tag "adoption_request[household_allergies]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Algún conviviente tiene alergias", name: "adoption_request[household_allergies]", value: "1",
+            checked: @adoption_request.household_allergies,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+
+        <%= hidden_field_tag "adoption_request[has_experience]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Tengo experiencia cuidando animales", name: "adoption_request[has_experience]", value: "1",
+            checked: @adoption_request.has_experience,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors" %>
+      </div>
+
+      <div>
+        <%= hidden_field_tag "adoption_request[other_pets]", "0" %>
+        <%= render "shared/components/checkbox/checkbox",
+            label: "Hay otros animales en el hogar", name: "adoption_request[other_pets]", value: "1",
+            checked: @adoption_request.other_pets,
+            classes: "p-4 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors mb-3" %>
+
+        <%= render "shared/components/forms/form_group",
+            label: "Contanos sobre los otros animales", name: "adoption_request[other_pets_details]",
+            helper_text: "Especie, cantidad, si están vacunados/castrados. Requerido si marcaste la opción anterior.",
+            error: @adoption_request.errors[:other_pets_details].first do %>
+          <%= form.text_area :other_pets_details, rows: 2, class: "form-control" %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Tu motivación</h3>
+
+      <%= render "shared/components/forms/form_group",
+          label: "¿Por qué querés adoptarlo?", name: "adoption_request[motivation]", required: true,
+          error: @adoption_request.errors[:motivation].first do %>
+        <%= form.text_area :motivation, rows: 4, class: "form-control", required: true %>
+      <% end %>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-2">
+      <%= render "shared/components/buttons/button",
+          text: "Solicitar adopción", type: "submit", style: "fancy", variant: "primary",
+          data: { "turbo-submits-with": "Enviando..." } %>
+    </div>
+  <% end %>
+</div>

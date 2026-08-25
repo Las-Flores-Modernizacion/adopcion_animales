@@ -1,0 +1,19 @@
+es:
+  activerecord:
+    models:
+      animal:
+        one: "animal"
+        other: "animales"
+    attributes:
+      animal:
+        age: "edad"
+        answer_to_name: "responde a un nombre"
+    enums:
+      animal:
+        size:
+          small: "pequeño"
+          middle: "mediano"
+          big: "grande"
+        species:
+          dog: "perro"
+          cat: "gato"

@@ -17,17 +17,34 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.6.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+
+    <script nonce="<%= content_security_policy_nonce %>">
+      (function() {
+        const storedMode = localStorage.getItem("theme");
+        const palette = storedMode === "light" || storedMode === "dark"
+          ? storedMode
+          : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        const root = document.documentElement;
+
+        root.classList.toggle("dark", palette === "dark");
+        root.style.colorScheme = palette;
+        root.dataset.theme = palette;
+      })();
+    </script>
+
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-[#D4A872]">
+  <body class="h-full bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50">
     <%= render "shared/navbar" %>
     <main class="container mx-auto mt-10 px-5 flex flex-col items-center">
       <% flash.each do |type, msg| %>
-        <div class="w-full max-w-2xl p-4 mb-4 text-sm <%= type == 'alert' ? 'text-red-800 bg-red-50' : 'text-blue-800 bg-blue-50' %> rounded-lg" role="alert">
+        <div class="w-full max-w-2xl p-4 mb-4 text-sm <%= type == 'alert' ? 'text-red-800 bg-red-50 dark:text-red-200 dark:bg-red-950/50 dark:border dark:border-red-900/50' : 'text-blue-800 bg-blue-50 dark:text-blue-200 dark:bg-blue-950/50 dark:border dark:border-blue-900/50' %> rounded-lg" role="alert">
           <%= msg %>
         </div>
       <% end %>
