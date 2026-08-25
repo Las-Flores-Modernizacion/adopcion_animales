@@ -12,8 +12,14 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_root_path
   end
 
-  test "no redirige a un usuario autenticado que no es admin" do
+  test "redirige a un vecino autenticado a sus reportes" do
     sign_in_as users(:maria)
+    get root_path
+    assert_redirected_to reports_path
+  end
+
+  test "no redirige a un usuario autenticado que no es admin ni vecino" do
+    sign_in_as users(:cuidador)
     get root_path
     assert_response :success
   end

@@ -2,6 +2,12 @@ class PagesController < ApplicationController
   allow_unauthenticated_access only: :home
 
   def home
-    redirect_to admin_root_path if authenticated? && Current.account&.admin?
+    return unless authenticated?
+
+    if Current.account&.admin?
+      redirect_to admin_root_path
+    elsif Current.account&.vecino?
+      redirect_to reports_path
+    end
   end
 end

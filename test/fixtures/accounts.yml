@@ -18,3 +18,10 @@ admin:
   last_name: "Admin"
   user: admin
   role: admin
+
+cuidador:
+  email_address: "cuidador@example.com"
+  first_name: "Carlos"
+  last_name: "Cuidador"
+  user: cuidador
+  role: cuidado_animal
