@@ -1,0 +1,16 @@
+<% animal = report.animal %>
+
+<%= render "shared/components/card/card",
+  padding: "none",
+  shadow: "sm",
+  hoverable: true,
+  image_src: (report.photo.attached? ? report.photo.first : nil),
+  image_aspect: "square" do %>
+  <div class="p-4">
+    <h3 class="font-bold text-neutral-800 dark:text-neutral-100 capitalize"><%= animal&.species.presence || "Animal" %></h3>
+    <p class="text-sm text-neutral-500 dark:text-neutral-400 capitalize"><%= animal&.race.presence || "Raza sin especificar" %></p>
+    <div class="mt-2">
+      <%= render "shared/components/badge/badge", text: "Adoptado", variant: "green", size: "sm" %>
+    </div>
+  </div>
+<% end %>

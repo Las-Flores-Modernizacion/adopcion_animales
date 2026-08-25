@@ -1,25 +1,148 @@
-<div>
-	<div class="border-2 rounded-lg text-center font-semibold">
-		<h1 class="text-5x1 mb-px5 ">Centro de Adopcion <br> y Rescate Las Flores</h1>
-	</div>
-	<div>
-		<div class="flex flex-row items-center m-10">
-			<div class="rotate-20"><%= image_tag "patita_de_pug.png", alt: "Company Logo"%></div>
-			<h3 class="m-5">Entre todos ayudamos a quienes nos acompañan</h3>
-		</div>
-		<div class="flex flex-row-reverse items-center m-10">
-			<div class="-rotate-20"><%= image_tag "patita_de_pug.png", alt: "Company Logo"%></div>
-			<h3 class="m-5">Demostrar que nos importan con acciones</h3>
-		</div>
-	</div>
-</div>
-<div>
-	<div class="text-center font-semibold">
-		<h1>Animalitos de Las Flores</h1>
-		<h3>Conocélos</h3>
-	</div>
-	<div>
-		<p>¡Bienvenidos a Nuestra Página Web!<br>
-		Nos dedicamos a Ayudar a diversos animales en Situacion de Calle, Maltratos o que Estan Perdidos, Ubicandolos y Cuidandolos hasta que se Reunan con una Familia Amorosa.</p>
-	</div>
+<% rescued_count = @metrics.status_counts.fetch("adoptado", 0) + @metrics.status_counts.fetch("encontrado", 0) %>
+<% pluralize_es = ->(count, singular, plural) { count == 1 ? singular : plural } %>
+
+<div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-neutral-800 dark:text-neutral-100">Centro de Adopción y Rescate Las Flores</h1>
+      <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1 max-w-xl">
+        Ayudamos a animales en situación de calle, maltrato o extravío, ubicándolos y cuidándolos hasta que se reúnan con una familia amorosa.
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <% if authenticated? %>
+        <%= render "shared/components/buttons/button",
+          href: new_report_path,
+          text: "Reportar un caso",
+          icon: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'><path fill-rule='evenodd' d='M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z' clip-rule='evenodd' /></svg>",
+          pill: true,
+          style: "fancy"
+        %>
+        <%= render "shared/components/buttons/button", text: "Ver animales", href: animals_path, variant: "outline", pill: true %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Métricas %>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <p class="text-xs font-medium text-neutral-500 mb-1"><%= pluralize_es.call(@metrics.total_reports, "Caso reportado", "Casos reportados") %></p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white"><%= @metrics.total_reports %></p>
+    </div>
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <p class="text-xs font-medium text-neutral-500 mb-1"><%= pluralize_es.call(rescued_count, "Animal ayudado", "Animales ayudados") %></p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white"><%= rescued_count %></p>
+      <p class="text-[11px] text-neutral-400 mt-0.5">Encontrados + adoptados</p>
+    </div>
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <p class="text-xs font-medium text-neutral-500 mb-1">Tasa de resolución</p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white"><%= @metrics.resolution_rate %>%</p>
+    </div>
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <p class="text-xs font-medium text-neutral-500 mb-1"><%= pluralize_es.call(@metrics.total_users, "Vecino sumado", "Vecinos sumados") %></p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white"><%= @metrics.total_users %></p>
+    </div>
+  </div>
+
+  <%# Misión %>
+  <div class="grid sm:grid-cols-2 gap-4 mb-6">
+    <div class="flex items-center gap-4 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 flex-shrink-0 -rotate-12 text-amber-500 dark:text-amber-400" aria-hidden="true">
+        <ellipse cx="12" cy="16.5" rx="5" ry="4.2" />
+        <ellipse cx="5.5" cy="10" rx="2.1" ry="2.6" transform="rotate(-20 5.5 10)" />
+        <ellipse cx="9.5" cy="6.2" rx="2" ry="2.6" transform="rotate(-8 9.5 6.2)" />
+        <ellipse cx="14.5" cy="6.2" rx="2" ry="2.6" transform="rotate(8 14.5 6.2)" />
+        <ellipse cx="18.5" cy="10" rx="2.1" ry="2.6" transform="rotate(20 18.5 10)" />
+      </svg>
+      <h3 class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">
+        Entre todos ayudamos a quienes nos acompañan
+      </h3>
+    </div>
+    <div class="flex items-center gap-4 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 flex-shrink-0 rotate-12 text-amber-500 dark:text-amber-400" aria-hidden="true">
+        <ellipse cx="12" cy="16.5" rx="5" ry="4.2" />
+        <ellipse cx="5.5" cy="10" rx="2.1" ry="2.6" transform="rotate(-20 5.5 10)" />
+        <ellipse cx="9.5" cy="6.2" rx="2" ry="2.6" transform="rotate(-8 9.5 6.2)" />
+        <ellipse cx="14.5" cy="6.2" rx="2" ry="2.6" transform="rotate(8 14.5 6.2)" />
+        <ellipse cx="18.5" cy="10" rx="2.1" ry="2.6" transform="rotate(20 18.5 10)" />
+      </svg>
+      <h3 class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">
+        Demostrar que nos importan con acciones
+      </h3>
+    </div>
+  </div>
+
+  <%# Casos de éxito %>
+  <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 mb-6">
+    <h2 class="text-base font-semibold text-neutral-900 dark:text-white">Animalitos de Las Flores</h2>
+    <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-4">Conocé algunos de los casos que ya encontraron un final feliz.</p>
+
+    <% if @success_stories.any? %>
+      <% slides = @success_stories.map { |report| { content: render("pages/success_story_slide", report: report) } } %>
+      <% multiple_stories = @success_stories.size > 1 %>
+
+      <%= render "shared/components/carousel/carousel",
+        slides: slides,
+        slide_size: "quarter",
+        loop: multiple_stories,
+        dots: multiple_stories,
+        buttons: multiple_stories,
+        show_gradients: false
+      %>
+    <% else %>
+      <div class="flex flex-col items-center justify-center py-14 px-4 text-center bg-neutral-50 dark:bg-neutral-900/50 rounded-2xl border border-neutral-100 dark:border-neutral-800">
+        <div class="bg-emerald-100 dark:bg-emerald-950/60 p-4 rounded-full mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-10 text-emerald-600 dark:text-emerald-400">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21C12 21 4 13.87 4 8.94C4 5.66 6.46 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.54 3 20 5.66 20 8.94C20 13.87 12 21 12 21Z" />
+          </svg>
+        </div>
+        <h3 class="text-base font-semibold text-neutral-800 dark:text-neutral-100 mb-1">Todavía no hay casos cerrados</h3>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm">En cuanto se cierre el primer caso de adopción, vas a poder verlo acá.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Cómo ayudar %>
+  <div>
+    <h2 class="text-base font-semibold text-neutral-900 dark:text-white mb-1">¿Cómo podés ayudar?</h2>
+    <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-4">
+      <% if authenticated? %>
+        Elegí una opción para empezar.
+      <% else %>
+        Iniciá sesión con tu cuenta de Google para hacerlo.
+      <% end %>
+    </p>
+
+    <div class="grid sm:grid-cols-3 gap-4">
+      <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+        <h3 class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">Reportar un caso</h3>
+        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Contanos dónde viste un animal perdido, herido o en situación de calle.</p>
+        <% if authenticated? %>
+          <div class="mt-4">
+            <%= render "shared/components/buttons/button", text: "Reportar", href: new_report_path, variant: "outline", size: "sm", full_width: true %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+        <h3 class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">Dar tránsito</h3>
+        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Ofrecé tu casa como hogar temporal mientras se busca una familia definitiva.</p>
+        <% if authenticated? %>
+          <div class="mt-4">
+            <%= render "shared/components/buttons/button", text: "Ver reportes", href: reports_path, variant: "outline", size: "sm", full_width: true %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5">
+        <h3 class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">Adoptar</h3>
+        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Conocé los animales disponibles y comenzá el proceso de adopción.</p>
+        <% if authenticated? %>
+          <div class="mt-4">
+            <%= render "shared/components/buttons/button", text: "Ver animales", href: animals_path, variant: "outline", size: "sm", full_width: true %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
 </div>
