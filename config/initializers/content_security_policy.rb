@@ -10,7 +10,10 @@ Rails.application.configure do
     policy.base_uri     :self
     policy.object_src   :none
     policy.frame_ancestors :none
-    policy.form_action  :self
+    # Google OAuth's request phase redirects the browser to accounts.google.com;
+    # Chrome enforces form-action against that post-submission redirect target too,
+    # not just the form's own action URL, so it needs to be allowed explicitly.
+    policy.form_action  :self, "https://accounts.google.com"
 
     # Avatars come from the account's Google profile photo (accounts.avatar_url).
     # Map tiles for the sighting map (mapa de triangulación) come from OpenStreetMap.
