@@ -17,7 +17,9 @@ Rails.application.configure do
 
     # Avatars come from the account's Google profile photo (accounts.avatar_url).
     # Map tiles for the sighting map (mapa de triangulación) come from OpenStreetMap.
-    policy.img_src      :self, :data, "https://*.googleusercontent.com", "https://*.tile.openstreetmap.org"
+    # Leaflet's default marker icon images come from jsdelivr, same CDN it's pinned from
+    # (ver app/javascript/controllers/map_controller.js).
+    policy.img_src      :self, :data, "https://*.googleusercontent.com", "https://*.tile.openstreetmap.org", "https://cdn.jsdelivr.net"
     policy.font_src     :self
 
     # embla-carousel, floating-ui, tom-select and leaflet are pinned from jsdelivr in

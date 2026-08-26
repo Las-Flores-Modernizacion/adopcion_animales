@@ -18,6 +18,18 @@ const LAS_FLORES_BOUNDS = [
 const MIN_ZOOM = 10;
 const DEFAULT_ZOOM = 13;
 
+// Leaflet's default marker icon auto-detects its image path from a
+// <script src="...leaflet..."> tag in the DOM, which doesn't exist when
+// Leaflet is loaded como módulo ESM desde el CDN (ver config/importmap.rb) —
+// sin esto, las imágenes del ícono dan 404 y el navegador muestra el ícono
+// de imagen rota.
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
 export default class extends Controller {
   static values = {
     markers: Array,
