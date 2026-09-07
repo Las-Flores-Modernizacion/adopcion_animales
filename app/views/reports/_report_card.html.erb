@@ -20,7 +20,7 @@
 <% media = capture do %>
   <% if report.photo.attached? %>
     <% if slidable && report.photo.count > 1 %>
-      <% slides = report.photo.map { |p| { content: image_tag(p, class: "w-full h-48 object-cover") } } %>
+      <% slides = report.photo.map { |p| { content: image_tag(p, class: "w-full h-64 object-cover") } } %>
       <%= render "shared/components/carousel/carousel",
           slides: slides,
           slide_size: "full",
@@ -67,7 +67,7 @@
     shadow: "sm",
     hoverable: true,
     media_content: media,
-    image_classes: "h-48 flex-shrink-0",
+    image_classes: "h-64 flex-shrink-0",
     classes: "flex flex-col" do %>
   <div class="p-4 flex flex-col flex-grow">
     <h3 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 mb-1 capitalize truncate">
